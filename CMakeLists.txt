@@ -39,6 +39,13 @@ set(SPOUT_SOURCES
 target_sources(${PROJECT_NAME} PRIVATE ${SPOUT_SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${SPOUT_DIR})
 
+# SpoutCopy.cpp uses SSSE3 intrinsics (_mm_shuffle_epi8). Clang refuses to
+# inline them unless the SSSE3 target feature is enabled. Enable it for all
+# SpoutGL sources (safe: any x86_64 CPU that runs GD/Windows supports SSSE3).
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set_source_files_properties(${SPOUT_SOURCES} PROPERTIES COMPILE_OPTIONS -mssse3)
+endif()
+
 # Windows libs needed by Spout
 if (WIN32)
     target_link_libraries(${PROJECT_NAME} opengl32 d3d11 dxgi shlwapi version)
