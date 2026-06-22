@@ -2,19 +2,13 @@
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/GameObject.hpp>
 #include <Geode/modify/CCDirector.hpp>
-
-#include <cocos2d.h>
-
-#ifdef _WIN32
-#include <GL/gl.h>
-#endif
+#include <Geode/modify/GJBaseGameLayer.hpp>
 
 #include "DualRender.hpp"
 #include "LayoutConfig.hpp"
 
-// Spout2 SDK (fetched via CMake FetchContent).
-// Modern API: the top-level class is `Spout` (in Spout.h).
-// `spoutSender`/`GetSpout()` do NOT exist in the current repository.
+// Spout2 SDK (compiled into a separate static lib, see CMakeLists.txt).
+// Only this .cpp includes Spout headers — avoids GLEW conflicts with Geode's bundled GLEW.
 #include "Spout.h"
 
 using namespace geode::prelude;
@@ -86,30 +80,23 @@ namespace SpoutWrapper {
 // Render-time color override (fixes Bug #1)
 // `updateColor` is called by game logic (triggers / level start), NOT by
 // the render loop. Checking s_isLayoutPass there had no effect. Instead we
-// recolor the BG / Ground / Line sprites right before the layout pass is
-// drawn, and restore them immediately after, so the clean OBS pass is
-// unaffected.
+// recolor the BG / Ground sprites right before the layout pass is drawn,
+// and restore them immediately after, so the clean OBS pass is unaffected.
 // ============================================================
 namespace LayoutLook {
     struct Saved {
-        cocos2d::CCNode* node = nullptr;
+        cocos2d::CCNodeRGBA* node;
         cocos2d::ccColor3B color;
     };
     static std::vector<Saved> g_saved;
 
     static void recolorOne(cocos2d::CCNode* node, cocos2d::ccColor3B c) {
         if (!node) return;
-        auto* sprite = dynamic_cast<cocos2d::CCSprite*>(node);
-        if (!sprite) {
-            // CCLayerColor / CCNodeRGB — try generic setColor
-            if (auto* rgb = dynamic_cast<cocos2d::CCRGBAProtocol*>(node)) {
-                g_saved.push_back({ node, rgb->getColor() });
-                node->setColor(c);
-            }
-            return;
-        }
-        g_saved.push_back({ node, sprite->getColor() });
-        sprite->setColor(c);
+        // Only CCNodeRGBA subclasses (CCSprite, CCLayerRGBA, etc.) have setColor.
+        auto* rgba = dynamic_cast<cocos2d::CCNodeRGBA*>(node);
+        if (!rgba) return;
+        g_saved.push_back({ rgba, rgba->getColor() });
+        rgba->setColor(c);
     }
 
     static void apply(PlayLayer* pl) {
@@ -118,7 +105,6 @@ namespace LayoutLook {
         recolorOne(pl->m_background,  LAYOUT_BG);
         recolorOne(pl->m_groundLayer, LAYOUT_GROUND);
         if (pl->m_groundLayer && pl->m_groundLayer->getChildren()) {
-            // GJGroundLayer often holds top/bottom ground sprites as children
             for (size_t i = 0; i < pl->m_groundLayer->getChildrenCount(); ++i) {
                 recolorOne(static_cast<cocos2d::CCNode*>(
                     pl->m_groundLayer->getChildren()->objectAtIndex(i)), LAYOUT_GROUND);
@@ -207,7 +193,8 @@ class $modify(DualRenderDirector, CCDirector) {
         }
 
         auto* scene = getRunningScene();
-        auto* pl = utils::get<PlayLayer>();
+        // Get PlayLayer via static getter — it's the currently active gameplay layer
+        auto* pl = PlayLayer::get();
 
         // Spout not ready / no offscreen target — still do layout on screen.
         if (!DualRender::s_spoutInitialized || !DualRender::s_rt || !scene) {

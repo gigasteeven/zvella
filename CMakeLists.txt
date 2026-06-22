@@ -11,12 +11,12 @@ add_library(${PROJECT_NAME} SHARED ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 
 # ============================================
-# Spout2 — fetch sources only (no add_subdirectory)
-# We deliberately do NOT call FetchContent_MakeAvailable, because Spout2's own
-# CMakeLists builds a separate `Spout_static` target in a subdirectory scope
-# that we cannot reliably inject compiler flags into (and that would also
-# duplicate-compile the same .cpp files into our target). Instead we only
-# download the sources and compile them ourselves with the flags we need.
+# Spout2 — fetch sources only (NOT MakeAvailable)
+# We build Spout2 into its own STATIC library so that:
+#   - Spout files don't see Geode/Cocos/GLEW headers (avoids glShaderSource
+#     redeclaration conflicts between SpoutGLextensions.h and cocos GLEW)
+#   - We can enable -mssse3 for SpoutCopy.cpp without conflicting with the
+#     pre-compiled header (PCH) that Geode generates for the main mod target
 # ============================================
 include(FetchContent)
 FetchContent_Declare(
@@ -31,7 +31,9 @@ if(NOT spout2_POPULATED)
 endif()
 
 set(SPOUT_DIR "${spout2_SOURCE_DIR}/SPOUTSDK/SpoutGL")
-set(SPOUT_SOURCES
+
+# Separate static library for SpoutGL — no Geode headers, no PCH
+add_library(SpoutGL_static STATIC
     ${SPOUT_DIR}/Spout.cpp
     ${SPOUT_DIR}/SpoutCopy.cpp
     ${SPOUT_DIR}/SpoutDirectX.cpp
@@ -43,24 +45,24 @@ set(SPOUT_SOURCES
     ${SPOUT_DIR}/SpoutSharedMemory.cpp
     ${SPOUT_DIR}/SpoutUtils.cpp
 )
-target_sources(${PROJECT_NAME} PRIVATE ${SPOUT_SOURCES})
-target_include_directories(${PROJECT_NAME} PRIVATE ${SPOUT_DIR})
+target_include_directories(SpoutGL_static PUBLIC ${SPOUT_DIR})
 
-# SpoutCopy.cpp uses SSSE3 intrinsics (_mm_shuffle_epi8). Clang refuses to
-# inline them unless the 'ssse3' target feature is enabled on the TU.
-# Safe: any x86_64 CPU that runs GD on Windows supports SSSE3 (since 2004).
+# SpoutCopy.cpp uses SSSE3 intrinsics (_mm_shuffle_epi8).
+# Clang needs -mssse3 to compile that file. Safe: all x86_64 CPUs support SSSE3.
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set_source_files_properties(${SPOUT_DIR}/SpoutCopy.cpp PROPERTIES COMPILE_OPTIONS -mssse3)
+    target_compile_options(SpoutGL_static PRIVATE -mssse3)
 endif()
 
-# Windows libs needed by Spout
 if (WIN32)
-    target_link_libraries(${PROJECT_NAME} opengl32 d3d11 dxgi shlwapi version)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE
+    target_link_libraries(SpoutGL_static PUBLIC opengl32 d3d11 dxgi shlwapi version)
+    target_compile_definitions(SpoutGL_static PRIVATE
         _CRT_SECURE_NO_WARNINGS
-        SPOUT_BUILD_DLL  # Needed so SpoutGL exports work
+        SPOUT_BUILD_DLL
     )
 endif()
+
+# Link Spout into the mod — only the mod's .cpp includes Spout headers
+target_link_libraries(${PROJECT_NAME} PRIVATE SpoutGL_static)
 
 # GitHub Actions config
 if (DEFINED ENV{GITHUB_ACTIONS})
