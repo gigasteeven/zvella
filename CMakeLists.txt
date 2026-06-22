@@ -61,8 +61,11 @@ if (WIN32)
     )
 endif()
 
-# Link Spout into the mod — only the mod's .cpp includes Spout headers
-target_link_libraries(${PROJECT_NAME} PRIVATE SpoutGL_static)
+# Link Spout into the mod — only the mod's .cpp includes Spout headers.
+# IMPORTANT: use PLAIN signature (no PRIVATE/PUBLIC keyword). Geode's
+# setup_geode_mod() calls target_link_libraries with plain signature, and
+# CMake forbids mixing keyword/plain on the same target.
+target_link_libraries(${PROJECT_NAME} SpoutGL_static)
 
 # GitHub Actions config
 if (DEFINED ENV{GITHUB_ACTIONS})
