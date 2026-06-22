@@ -2,7 +2,6 @@
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/GameObject.hpp>
 #include <Geode/modify/CCDirector.hpp>
-#include <Geode/modify/GJBaseGameLayer.hpp>
 
 #include "DualRender.hpp"
 #include "LayoutConfig.hpp"
