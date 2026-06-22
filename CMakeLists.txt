@@ -11,7 +11,12 @@ add_library(${PROJECT_NAME} SHARED ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 
 # ============================================
-# Spout2 — fetch from GitHub and compile in
+# Spout2 — fetch sources only (no add_subdirectory)
+# We deliberately do NOT call FetchContent_MakeAvailable, because Spout2's own
+# CMakeLists builds a separate `Spout_static` target in a subdirectory scope
+# that we cannot reliably inject compiler flags into (and that would also
+# duplicate-compile the same .cpp files into our target). Instead we only
+# download the sources and compile them ourselves with the flags we need.
 # ============================================
 include(FetchContent)
 FetchContent_Declare(
@@ -20,9 +25,11 @@ FetchContent_Declare(
     GIT_TAG master
     GIT_SHALLOW TRUE
 )
-FetchContent_MakeAvailable(spout2)
+FetchContent_GetProperties(spout2)
+if(NOT spout2_POPULATED)
+    FetchContent_Populate(spout2)
+endif()
 
-# Collect SpoutGL source files
 set(SPOUT_DIR "${spout2_SOURCE_DIR}/SPOUTSDK/SpoutGL")
 set(SPOUT_SOURCES
     ${SPOUT_DIR}/Spout.cpp
@@ -40,16 +47,16 @@ target_sources(${PROJECT_NAME} PRIVATE ${SPOUT_SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${SPOUT_DIR})
 
 # SpoutCopy.cpp uses SSSE3 intrinsics (_mm_shuffle_epi8). Clang refuses to
-# inline them unless the SSSE3 target feature is enabled. Enable it for all
-# SpoutGL sources (safe: any x86_64 CPU that runs GD/Windows supports SSSE3).
+# inline them unless the 'ssse3' target feature is enabled on the TU.
+# Safe: any x86_64 CPU that runs GD on Windows supports SSSE3 (since 2004).
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set_source_files_properties(${SPOUT_SOURCES} PROPERTIES COMPILE_OPTIONS -mssse3)
+    set_source_files_properties(${SPOUT_DIR}/SpoutCopy.cpp PROPERTIES COMPILE_OPTIONS -mssse3)
 endif()
 
 # Windows libs needed by Spout
 if (WIN32)
     target_link_libraries(${PROJECT_NAME} opengl32 d3d11 dxgi shlwapi version)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE 
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
         _CRT_SECURE_NO_WARNINGS
         SPOUT_BUILD_DLL  # Needed so SpoutGL exports work
     )
