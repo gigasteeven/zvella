@@ -1,0 +1,26 @@
+{
+	"geode": "5.7.1",
+	"gd": {
+		"win": "2.2081"
+	},
+	"version": "v1.0.0",
+	"id": "layoutmode.obs-bypass",
+	"name": "Layout Mode OBS Bypass",
+	"description": "Play with Layout Mode on your screen while OBS captures normal gameplay via Spout2.",
+	"developer": "LayoutModder",
+	"tags": ["gameplay", "utility", "customization"],
+	"settings": {
+		"enabled": {
+			"name": "Enable Dual Render",
+			"description": "Toggle dual rendering (Layout Mode on screen, normal in OBS)",
+			"type": "bool",
+			"default": true
+		},
+		"spout-name": {
+			"name": "Spout Sender Name",
+			"description": "Name of the Spout2 sender (use this in OBS Spout2 Capture)",
+			"type": "string",
+			"default": "GD_Clean"
+		}
+	}
+}
