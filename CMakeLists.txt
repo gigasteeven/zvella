@@ -10,6 +10,16 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 
+# SpoutWrapper.cpp must NOT use the Geode PCH and must NOT see Geode/GLEW
+# headers, because Spout2's SpoutGLextensions.h declares GL entry points that
+# conflict with Geode's bundled GLEW macros (glShaderSource redeclaration).
+# It is a plain TU that talks to Spout only. The Geode PCH (which pulls in
+# GLEW) must be skipped for it.
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/SpoutWrapper.cpp
+    PROPERTIES
+        SKIP_PRECOMPILE_HEADERS ON
+        COMPILE_OPTIONS -U_GLEW_H)
+
 # ============================================
 # Spout2 — fetch sources only (NOT MakeAvailable)
 # We build Spout2 into its own STATIC library so that:

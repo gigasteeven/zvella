@@ -5,10 +5,7 @@
 
 #include "DualRender.hpp"
 #include "LayoutConfig.hpp"
-
-// Spout2 SDK (compiled into a separate static lib, see CMakeLists.txt).
-// Only this .cpp includes Spout headers — avoids GLEW conflicts with Geode's bundled GLEW.
-#include "Spout.h"
+#include "SpoutWrapper.hpp"   // Spout calls live in SpoutWrapper.cpp (no Geode/GLEW)
 
 using namespace geode::prelude;
 
@@ -21,45 +18,35 @@ static constexpr cocos2d::ccColor3B LAYOUT_LINE  = {255, 255, 255 };
 static constexpr cocos2d::ccColor3B LAYOUT_MG    = { 40, 125, 255 };
 
 // ============================================================
-// Spout2 wrapper — modern `Spout` class API
+// Dual render lifecycle helpers (wrap SpoutWrapper with Geode state + logging)
 // ============================================================
-namespace SpoutWrapper {
-    static Spout* s_sender = nullptr;
+namespace DualRenderLifecycle {
+    static std::string senderName() {
+        return Mod::get()->getSettingValue<std::string>("spout-name");
+    }
 
-    bool init(int w, int h) {
-        if (s_sender) return true;
-
-        s_sender = new Spout();
-
-        std::string name = Mod::get()->getSettingValue<std::string>("spout-name");
-        bool ok = s_sender->CreateSender(name.c_str(), w, h);
+    static bool init(int w, int h) {
+        std::string name = senderName();
+        bool ok = SpoutWrapper::init(w, h, name);
 
         DualRender::s_width  = w;
         DualRender::s_height = h;
         DualRender::s_spoutInitialized = ok;
 
-        if (ok) {
-            log::info("Spout sender '{}' created ({}x{})", name, w, h);
-        } else {
-            log::error("Failed to create Spout sender '{}'", name);
-        }
+        if (ok) log::info("Spout sender '{}' created ({}x{})", name, w, h);
+        else    log::error("Failed to create Spout sender '{}'", name);
         return ok;
     }
 
-    void sendTexture(GLuint texID) {
-        if (!s_sender || !DualRender::s_spoutInitialized) return;
-        // SendTexture(texID, target, width, height, bInvert, HostFBO)
-        // bInvert=true : Spout internally flips vertically so OBS displays upright.
-        s_sender->SendTexture(texID, GL_TEXTURE_2D,
-                              DualRender::s_width, DualRender::s_height, true, 0);
+    static void sendRT() {
+        if (!DualRender::s_rt) return;
+        SpoutWrapper::sendTexture(
+            DualRender::s_rt->getSprite()->getTexture()->getName(),
+            DualRender::s_width, DualRender::s_height, true);
     }
 
-    void release() {
-        if (s_sender) {
-            s_sender->ReleaseSender();
-            delete s_sender;
-            s_sender = nullptr;
-        }
+    static void release() {
+        SpoutWrapper::release();
         if (DualRender::s_rt) {
             DualRender::s_rt->release();
             DualRender::s_rt = nullptr;
@@ -68,7 +55,7 @@ namespace SpoutWrapper {
         log::info("Spout sender released");
     }
 
-    void resize(int w, int h) {
+    static void resize(int w, int h) {
         if (w == DualRender::s_width && h == DualRender::s_height) return;
         release();
         init(w, h);
@@ -76,11 +63,11 @@ namespace SpoutWrapper {
 }
 
 // ============================================================
-// Render-time color override (fixes Bug #1)
-// `updateColor` is called by game logic (triggers / level start), NOT by
-// the render loop. Checking s_isLayoutPass there had no effect. Instead we
-// recolor the BG / Ground sprites right before the layout pass is drawn,
-// and restore them immediately after, so the clean OBS pass is unaffected.
+// Render-time color override (fixes Bug #1).
+// `updateColor` is called by game logic (triggers / level start), NOT by the
+// render loop, so checking s_isLayoutPass there had no effect. Instead we
+// recolor BG / Ground right before the layout pass is drawn and restore
+// immediately after, so the clean OBS pass is unaffected.
 // ============================================================
 namespace LayoutLook {
     struct Saved {
@@ -91,7 +78,7 @@ namespace LayoutLook {
 
     static void recolorOne(cocos2d::CCNode* node, cocos2d::ccColor3B c) {
         if (!node) return;
-        // Only CCNodeRGBA subclasses (CCSprite, CCLayerRGBA, etc.) have setColor.
+        // Only CCNodeRGBA subclasses (CCSprite, CCLayerRGBA, ...) have setColor.
         auto* rgba = dynamic_cast<cocos2d::CCNodeRGBA*>(node);
         if (!rgba) return;
         g_saved.push_back({ rgba, rgba->getColor() });
@@ -164,7 +151,7 @@ class $modify(DualRenderPlayLayer, PlayLayer) {
             DualRender::s_rt = CCRenderTexture::create(w, h, kCCTexture2DPixelFormat_RGBA8888);
             DualRender::s_rt->retain();
 
-            SpoutWrapper::init(w, h);
+            DualRenderLifecycle::init(w, h);
             DualRender::s_active = true;
             log::info("Dual render activated for level: {}", level->m_levelName);
         }
@@ -173,7 +160,7 @@ class $modify(DualRenderPlayLayer, PlayLayer) {
 
     void onQuit() {
         DualRender::s_active = false;
-        SpoutWrapper::release();
+        DualRenderLifecycle::release();
         PlayLayer::onQuit();
     }
 };
@@ -192,7 +179,6 @@ class $modify(DualRenderDirector, CCDirector) {
         }
 
         auto* scene = getRunningScene();
-        // Get PlayLayer via static getter — it's the currently active gameplay layer
         auto* pl = PlayLayer::get();
 
         // Spout not ready / no offscreen target — still do layout on screen.
@@ -210,7 +196,7 @@ class $modify(DualRenderDirector, CCDirector) {
         const int w = static_cast<int>(win.width);
         const int h = static_cast<int>(win.height);
         if (w != DualRender::s_width || h != DualRender::s_height) {
-            SpoutWrapper::resize(w, h);
+            DualRenderLifecycle::resize(w, h);
             if (!DualRender::s_rt) {
                 DualRender::s_rt = CCRenderTexture::create(w, h, kCCTexture2DPixelFormat_RGBA8888);
                 DualRender::s_rt->retain();
@@ -219,19 +205,16 @@ class $modify(DualRenderDirector, CCDirector) {
 
         // --- PASS 1: CLEAN → offscreen texture → Spout (OBS) ---
         DualRender::s_isLayoutPass = false;
-        // beginWithClear(r,g,b,a, depth, stencil) correctly clears depth/stencil
-        // and sets up the projection for the offscreen FBO (fixes Bugs #2 & #4).
         DualRender::s_rt->beginWithClear(0.f, 0.f, 0.f, 1.f, 1.f, 0);
         scene->visit();
         DualRender::s_rt->end();
 
-        SpoutWrapper::sendTexture(
-            DualRender::s_rt->getSprite()->getTexture()->getName());
+        DualRenderLifecycle::sendRT();
 
         // --- PASS 2: LAYOUT → default framebuffer (screen) ---
         DualRender::s_isLayoutPass = true;
         LayoutLook::apply(pl);
-        CCDirector::drawScene();        // real cocos pipeline → screen
+        CCDirector::drawScene();
         LayoutLook::restore();
         DualRender::s_isLayoutPass = false;
     }
