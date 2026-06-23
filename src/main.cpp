@@ -34,6 +34,7 @@ void initLayoutShader() {
     g_layoutShader = new cocos2d::CCGLProgram();
     
     const GLchar* vertSource = R"(
+        uniform mat4 CC_MVPMatrix;
         attribute vec4 a_position;
         attribute vec2 a_texCoord;
         attribute vec4 a_color;
@@ -316,9 +317,10 @@ class $modify(DualMenuLayer, MenuLayer) {
         
         if (Mod::get()->getSettingValue<bool>("enabled")) {
             if (!DualRender::s_active) {
-                auto ws = cocos2d::CCDirector::sharedDirector()->getWinSizeInPixels();
-                int w = static_cast<int>(ws.width);
-                int h = static_cast<int>(ws.height);
+                GLint viewport[4];
+                glGetIntegerv(GL_VIEWPORT, viewport);
+                int w = viewport[2];
+                int h = viewport[3];
 
                 DualRender::s_rt = cocos2d::CCRenderTexture::create(
                     w, h, cocos2d::kCCTexture2DPixelFormat_RGBA8888, GL_DEPTH24_STENCIL8);
@@ -381,11 +383,12 @@ class $modify(DualDirector, cocos2d::CCDirector) {
             return;
         }
 
-        if (!DualRender::s_active) {
-            auto ws = getWinSizeInPixels();
-            int w = static_cast<int>(ws.width);
-            int h = static_cast<int>(ws.height);
+        GLint viewport[4];
+        glGetIntegerv(GL_VIEWPORT, viewport);
+        int w = viewport[2];
+        int h = viewport[3];
 
+        if (!DualRender::s_active) {
             DualRender::s_rt = cocos2d::CCRenderTexture::create(
                 w, h, cocos2d::kCCTexture2DPixelFormat_RGBA8888, GL_DEPTH24_STENCIL8);
             if (DualRender::s_rt) DualRender::s_rt->retain();
@@ -398,10 +401,6 @@ class $modify(DualDirector, cocos2d::CCDirector) {
         auto* scene = getRunningScene();
         auto* pl    = DualRender::s_inPlayLayer ? PlayLayer::get() : nullptr;
         auto* rt    = DualRender::s_rt;
-
-        auto ws = getWinSizeInPixels();
-        int w = static_cast<int>(ws.width);
-        int h = static_cast<int>(ws.height);
 
         if (w != DualRender::s_width || h != DualRender::s_height) {
             SpoutLife::stop();
@@ -436,7 +435,7 @@ class $modify(DualDirector, cocos2d::CCDirector) {
             if (rt && DualRender::s_spoutInitialized) {
                 auto tex = rt->getSprite()->getTexture();
                 ccGLBindTexture2D(tex->getName());
-                glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, w, h);
+                glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, viewport[0], viewport[1], w, h);
                 SpoutLife::send();
             }
             return;
