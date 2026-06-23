@@ -73,13 +73,7 @@ namespace LayoutState {
     struct ObjState {
         GameObject* obj;
         bool isDecoration;
-        
-        cocos2d::ccColor3B color;
-        cocos2d::ccColor3B detailColor;
-        GLubyte opacity;
-        GLubyte detailOpacity;
         bool visible;
-        bool glowVisible;
     };
     
     inline std::vector<ObjState> objects;
@@ -91,28 +85,13 @@ namespace LayoutState {
             // Safety check in case object was removed from the layer
             if (!st.obj || !st.obj->getParent()) continue;
 
-            st.color = st.obj->getColor();
-            st.opacity = st.obj->getOpacity();
             st.visible = st.obj->isVisible();
             
-            if (st.obj->m_colorSprite) {
-                st.detailColor = st.obj->m_colorSprite->getColor();
-                st.detailOpacity = st.obj->m_colorSprite->getOpacity();
-            }
-            st.glowVisible = st.obj->m_glowSprite ? st.obj->m_glowSprite->isVisible() : false;
-            
+            // Only hide decorations. Do not touch color/opacity, as GD 2.2
+            // shaders use vertex color for channel IDs. Overwriting it causes
+            // blocks to turn black/invisible!
             if (st.isDecoration) {
                 st.obj->setVisible(false);
-            } else {
-                st.obj->setColor({255, 255, 255});
-                st.obj->setOpacity(255);
-                st.obj->setVisible(true);
-                
-                if (st.obj->m_colorSprite) {
-                    st.obj->m_colorSprite->setColor({255, 255, 255});
-                    st.obj->m_colorSprite->setOpacity(255);
-                }
-                if (st.obj->m_glowSprite) st.obj->m_glowSprite->setVisible(false);
             }
         }
         layoutApplied = true;
@@ -122,16 +101,7 @@ namespace LayoutState {
         if (!layoutApplied) return;
         for (auto& st : objects) {
             if (!st.obj || !st.obj->getParent()) continue;
-
-            st.obj->setColor(st.color);
-            st.obj->setOpacity(st.opacity);
             st.obj->setVisible(st.visible);
-            
-            if (st.obj->m_colorSprite) {
-                st.obj->m_colorSprite->setColor(st.detailColor);
-                st.obj->m_colorSprite->setOpacity(st.detailOpacity);
-            }
-            if (st.obj->m_glowSprite) st.obj->m_glowSprite->setVisible(st.glowVisible);
         }
         layoutApplied = false;
     }
@@ -315,6 +285,7 @@ class $modify(DualDirector, cocos2d::CCDirector) {
         // --- PASS 1: CLEAN → render texture → Spout (OBS) ---
         DualRender::s_isLayoutPass = false;
         LayoutState::revertLayout(); // Ensure objects are normal
+        SolidBackground::hide();     // Ensure OBS sees the actual level background!
 
         rt->beginWithClear(0.f, 0.f, 0.f, 1.f, 1.f, 0);
         scene->visit();
@@ -323,9 +294,9 @@ class $modify(DualDirector, cocos2d::CCDirector) {
 
         // --- PASS 2: LAYOUT → default framebuffer (screen) ---
         DualRender::s_isLayoutPass = true;
-        LayoutState::applyLayout(); // Force objects into layout appearance
+        LayoutState::applyLayout(); // Hide decorations
 
-        SolidBackground::show();
+        SolidBackground::show(); // Black background for Layout Mode
         cocos2d::CCDirector::drawScene(); // real pipeline → screen
         SolidBackground::hide();
 
