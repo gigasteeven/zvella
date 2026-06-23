@@ -13,76 +13,125 @@ using namespace geode::prelude;
 static constexpr cocos2d::ccColor3B LAYOUT_BG    = { 40, 125, 255};
 static constexpr cocos2d::ccColor3B LAYOUT_GROUND= {  0, 102, 255};
 static constexpr cocos2d::ccColor3B LAYOUT_MG    = { 40, 125, 255};
-static constexpr cocos2d::ccColor3B LAYOUT_LINE  = { 255, 255, 255};
+
+static cocos2d::CCGLProgram* g_layoutShader = nullptr;
+
+void initLayoutShader() {
+    if (g_layoutShader) return;
+    g_layoutShader = new cocos2d::CCGLProgram();
+    
+    const GLchar* fragSource = R"(
+        varying vec4 v_fragmentColor;
+        varying vec2 v_texCoord;
+        uniform sampler2D CC_Texture0;
+        void main()
+        {
+            vec4 texColor = texture2D(CC_Texture0, v_texCoord);
+            if (texColor.a > 0.0) {
+                // Force white color, keep original alpha
+                gl_FragColor = vec4(1.0, 1.0, 1.0, texColor.a);
+            } else {
+                gl_FragColor = vec4(0.0);
+            }
+        }
+    )";
+    
+    // Standard Cocos2d-x vertex shader
+    const GLchar* vertSource = R"(
+        attribute vec4 a_position;
+        attribute vec2 a_texCoord;
+        attribute vec4 a_color;
+        varying vec4 v_fragmentColor;
+        varying vec2 v_texCoord;
+        void main()
+        {
+            gl_Position = CC_PMatrix * a_position;
+            v_fragmentColor = a_color;
+            v_texCoord = a_texCoord;
+        }
+    )";
+    
+    g_layoutShader->initWithVertexShaderByteArray(vertSource, fragSource);
+    g_layoutShader->addAttribute(kCCAttributeNamePosition, kCCVertexAttrib_Position);
+    g_layoutShader->addAttribute(kCCAttributeNameColor, kCCVertexAttrib_Color);
+    g_layoutShader->addAttribute(kCCAttributeNameTexCoord, kCCVertexAttrib_TexCoords);
+    g_layoutShader->link();
+    g_layoutShader->updateUniforms();
+    g_layoutShader->retain();
+}
 
 // ============================================================
-// LayoutStateSwapper — caches original state and swaps back/forth
+// LayoutFastSwapper — ZERO CPU OVERHEAD
+// Uses Shaders and Visibility toggles. No VBO rebuilds!
 // ============================================================
-namespace LayoutStateSwapper {
-    struct ObjState {
-        GameObject* obj;
-        bool isDeco;
-        bool origVisible;
-        bool origGlow;
-        cocos2d::ccColor3B origColor;
-        GLubyte origOpacity;
-    };
-
-    static std::vector<ObjState> g_objects;
+namespace LayoutFastSwapper {
+    static std::vector<GameObject*> g_decorations;
+    
+    struct SavedShader { cocos2d::CCNode* node; cocos2d::CCGLProgram* shader; };
+    static std::vector<SavedShader> g_savedShaders;
+    
+    struct SavedVisibility { cocos2d::CCNode* node; bool visible; };
+    static std::vector<SavedVisibility> g_savedGlowNodes;
 
     void clear() {
-        g_objects.clear();
+        g_decorations.clear();
+        g_savedShaders.clear();
+        g_savedGlowNodes.clear();
     }
 
     void tryAdd(GameObject* obj) {
         if (!obj) return;
-        bool isDeco = LayoutConfig::isDecoration(obj->m_objectID, obj->m_objectType);
-        
-        g_objects.push_back({
-            obj,
-            isDeco,
-            obj->isVisible(),
-            obj->m_hasNoGlow,
-            obj->getColor(),
-            obj->getOpacity()
-        });
-    }
-
-    void applyLayout() {
-        for (auto& st : g_objects) {
-            if (st.isDeco) {
-                st.obj->setVisible(false);
-            } else {
-                st.obj->m_hasNoGlow = true;
-                st.obj->setColor(LAYOUT_LINE);
-                st.obj->setOpacity(255);
-            }
+        if (LayoutConfig::isDecoration(obj->m_objectID, obj->m_objectType)) {
+            g_decorations.push_back(obj);
         }
     }
 
-    void restoreOriginal() {
-        for (auto& st : g_objects) {
-            if (st.isDeco) {
-                st.obj->setVisible(st.origVisible);
-            } else {
-                st.obj->m_hasNoGlow = st.origGlow;
-                st.obj->setColor(st.origColor);
-                st.obj->setOpacity(st.origOpacity);
+    void applyLayoutMode(PlayLayer* pl) {
+        if (!pl || !pl->m_objectLayer) return;
+
+        // 1. Hide decorations (Fast)
+        for (auto* obj : g_decorations) {
+            obj->setVisible(false);
+        }
+
+        // 2. Hide Glow & Apply White Shader to blocks
+        auto children = pl->m_objectLayer->getChildren();
+        if (children) {
+            for (int i = 0; i < children->count(); i++) {
+                auto node = static_cast<cocos2d::CCNode*>(children->objectAtIndex(i));
+                if (auto batch = dynamic_cast<cocos2d::CCSpriteBatchNode*>(node)) {
+                    // Check if this is a glow batch node (Additive blending)
+                    cocos2d::ccBlendFunc blend = batch->getBlendFunc();
+                    if (blend.dst == GL_ONE) {
+                        g_savedGlowNodes.push_back({batch, batch->isVisible()});
+                        batch->setVisible(false);
+                    } else {
+                        // Regular blocks: apply white shader!
+                        g_savedShaders.push_back({batch, batch->getShaderProgram()});
+                        batch->setShaderProgram(g_layoutShader);
+                    }
+                }
             }
         }
     }
-    
-    // Updates original state if game logic changed it while restored
-    void snapshotOriginals() {
-        for (auto& st : g_objects) {
-            if (st.isDeco) {
-                st.origVisible = st.obj->isVisible();
-            } else {
-                st.origGlow = st.obj->m_hasNoGlow;
-                st.origColor = st.obj->getColor();
-                st.origOpacity = st.obj->getOpacity();
-            }
+
+    void restoreOriginalMode() {
+        // 1. Restore decorations
+        for (auto* obj : g_decorations) {
+            obj->setVisible(true);
         }
+
+        // 2. Restore Shaders
+        for (auto& st : g_savedShaders) {
+            if (st.node) st.node->setShaderProgram(st.shader);
+        }
+        g_savedShaders.clear();
+
+        // 3. Restore Glow
+        for (auto& st : g_savedGlowNodes) {
+            if (st.node) st.node->setVisible(st.visible);
+        }
+        g_savedGlowNodes.clear();
     }
 }
 
@@ -164,7 +213,8 @@ namespace SpoutLife {
 // ============================================================
 class $modify(DualPlayLayer, PlayLayer) {
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
-        LayoutStateSwapper::clear();
+        LayoutFastSwapper::clear();
+        initLayoutShader();
 
         if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
 
@@ -179,45 +229,31 @@ class $modify(DualPlayLayer, PlayLayer) {
 
             SpoutLife::start(w, h);
             DualRender::s_active = true;
-
-            log::info("Dual render ON — {} objects cached", LayoutStateSwapper::g_objects.size());
-            
-            // Set objects to Layout Mode by default!
-            LayoutStateSwapper::applyLayout();
         }
         return true;
     }
 
     void addObject(GameObject* obj) {
         PlayLayer::addObject(obj);
-        LayoutStateSwapper::tryAdd(obj);
+        LayoutFastSwapper::tryAdd(obj);
     }
 
     void onQuit() {
-        if (DualRender::s_active) {
-            LayoutStateSwapper::restoreOriginal();
-        }
         DualRender::s_active = false;
-        LayoutStateSwapper::clear();
+        LayoutFastSwapper::clear();
         SpoutLife::stop();
         PlayLayer::onQuit();
     }
-
+    
     void resetLevel() {
-        if (DualRender::s_active) {
-            LayoutStateSwapper::restoreOriginal();
-        }
+        // Ensure visible before reset
+        LayoutFastSwapper::restoreOriginalMode();
         PlayLayer::resetLevel();
-        if (DualRender::s_active) {
-            // Snapshot any reset states then reapply layout
-            LayoutStateSwapper::snapshotOriginals();
-            LayoutStateSwapper::applyLayout();
-        }
     }
 };
 
 // ============================================================
-// CCDirector::drawScene — asymmetric dual render core
+// CCDirector::drawScene — Fast Dual Render
 // ============================================================
 class $modify(DualDirector, cocos2d::CCDirector) {
     void drawScene() {
@@ -231,9 +267,11 @@ class $modify(DualDirector, cocos2d::CCDirector) {
         auto* rt    = DualRender::s_rt;
 
         if (!scene || !rt || !DualRender::s_spoutInitialized) {
+            LayoutFastSwapper::applyLayoutMode(pl);
             LayoutLook::apply(pl);
             cocos2d::CCDirector::drawScene();
             LayoutLook::restore();
+            LayoutFastSwapper::restoreOriginalMode();
             return;
         }
 
@@ -260,41 +298,39 @@ class $modify(DualDirector, cocos2d::CCDirector) {
             float elapsed = std::chrono::duration<float>(now - s_lastObsFrameTime).count();
             float frameTime = 1.0f / targetFps;
             if (elapsed < frameTime) {
-                shouldRenderObs = false; // Skip this frame for OBS
+                shouldRenderObs = false;
             } else {
                 s_lastObsFrameTime = now;
             }
         }
 
-        // --- THE ASYMMETRIC SWAP ---
-        // Game is natively in Layout Mode state right now!
-        
         if (shouldRenderObs) {
-            // ─── OBS PASS: Restore, Render, Re-apply ───
+            // ─── PASS 1: Clean render → texture → Spout (for OBS) ───
+            // Everything is in its NORMAL state right now!
             DualRender::s_isLayoutPass = false;
-            
-            LayoutStateSwapper::restoreOriginal(); // Put normal properties back
-            
             rt->beginWithClear(0.f, 0.f, 0.f, 1.f, 1.f, 0);
             scene->visit();
             rt->end();
             SpoutLife::send();
-            
-            LayoutStateSwapper::applyLayout(); // Put layout properties back
         }
 
-        // ─── SCREEN PASS: Layout Mode ───
-        // Properties are ALREADY in Layout Mode state!
+        // ─── PASS 2: Layout mode → screen (for player) ───
         DualRender::s_isLayoutPass = true;
         
+        // Fast Layout Apply (Shaders + Visibility toggles = 0 CPU overhead)
+        LayoutFastSwapper::applyLayoutMode(pl);
         LayoutLook::apply(pl);
+
         cocos2d::CCDirector::drawScene();
+
+        // Restore fast
         LayoutLook::restore();
+        LayoutFastSwapper::restoreOriginalMode();
         
         DualRender::s_isLayoutPass = false;
     }
 };
 
 $on_mod(Loaded) {
-    log::info("Layout Mode OBS Bypass Ultimate loaded!");
+    log::info("Layout Mode OBS Bypass ShaderEdition loaded!");
 }
