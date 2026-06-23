@@ -76,11 +76,8 @@ namespace LayoutState {
         
         cocos2d::ccColor3B color;
         cocos2d::ccColor3B detailColor;
-        int activeMainColorID;
-        int activeDetailColorID;
-        bool baseUsesHSV;
-        bool detailUsesHSV;
-        bool hasNoGlow;
+        GLubyte opacity;
+        GLubyte detailOpacity;
         bool visible;
         bool glowVisible;
     };
@@ -91,26 +88,30 @@ namespace LayoutState {
     static void applyLayout() {
         if (layoutApplied) return;
         for (auto& st : objects) {
+            // Safety check in case object was removed from the layer
+            if (!st.obj || !st.obj->getParent()) continue;
+
             st.color = st.obj->getColor();
-            st.activeMainColorID = st.obj->m_activeMainColorID;
-            st.activeDetailColorID = st.obj->m_activeDetailColorID;
-            st.baseUsesHSV = st.obj->m_baseUsesHSV;
-            st.detailUsesHSV = st.obj->m_detailUsesHSV;
-            st.hasNoGlow = st.obj->m_hasNoGlow;
+            st.opacity = st.obj->getOpacity();
             st.visible = st.obj->isVisible();
-            if (st.obj->m_colorSprite) st.detailColor = st.obj->m_colorSprite->getColor();
+            
+            if (st.obj->m_colorSprite) {
+                st.detailColor = st.obj->m_colorSprite->getColor();
+                st.detailOpacity = st.obj->m_colorSprite->getOpacity();
+            }
             st.glowVisible = st.obj->m_glowSprite ? st.obj->m_glowSprite->isVisible() : false;
             
             if (st.isDecoration) {
                 st.obj->setVisible(false);
             } else {
                 st.obj->setColor({255, 255, 255});
-                st.obj->m_activeMainColorID = -1;
-                st.obj->m_activeDetailColorID = -1;
-                st.obj->m_baseUsesHSV = false;
-                st.obj->m_detailUsesHSV = false;
-                st.obj->m_hasNoGlow = true;
-                if (st.obj->m_colorSprite) st.obj->m_colorSprite->setColor({255, 255, 255});
+                st.obj->setOpacity(255);
+                st.obj->setVisible(true);
+                
+                if (st.obj->m_colorSprite) {
+                    st.obj->m_colorSprite->setColor({255, 255, 255});
+                    st.obj->m_colorSprite->setOpacity(255);
+                }
                 if (st.obj->m_glowSprite) st.obj->m_glowSprite->setVisible(false);
             }
         }
@@ -120,14 +121,16 @@ namespace LayoutState {
     static void revertLayout() {
         if (!layoutApplied) return;
         for (auto& st : objects) {
+            if (!st.obj || !st.obj->getParent()) continue;
+
             st.obj->setColor(st.color);
-            st.obj->m_activeMainColorID = st.activeMainColorID;
-            st.obj->m_activeDetailColorID = st.activeDetailColorID;
-            st.obj->m_baseUsesHSV = st.baseUsesHSV;
-            st.obj->m_detailUsesHSV = st.detailUsesHSV;
-            st.obj->m_hasNoGlow = st.hasNoGlow;
+            st.obj->setOpacity(st.opacity);
             st.obj->setVisible(st.visible);
-            if (st.obj->m_colorSprite) st.obj->m_colorSprite->setColor(st.detailColor);
+            
+            if (st.obj->m_colorSprite) {
+                st.obj->m_colorSprite->setColor(st.detailColor);
+                st.obj->m_colorSprite->setOpacity(st.detailOpacity);
+            }
             if (st.obj->m_glowSprite) st.obj->m_glowSprite->setVisible(st.glowVisible);
         }
         layoutApplied = false;
@@ -293,14 +296,14 @@ class $modify(DualDirector, cocos2d::CCDirector) {
         // NON-PLAYLAYER (Menu/Editor): plain capture
         // ==========================================
         if (!pl) {
-            cocos2d::CCDirector::drawScene();
-            // Copy the default framebuffer into the render texture, then send.
-            GLint vp[4];
-            glGetIntegerv(GL_VIEWPORT, vp);
-            cocos2d::CCTexture2D* tex = rt->getSprite()->getTexture();
-            ccGLBindTexture2D(tex->getName());
-            glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, vp[0], vp[1], vp[2], vp[3]);
+            // OBS capture: render the scene into the RT
+            rt->beginWithClear(0.f, 0.f, 0.f, 1.f, 1.f, 0);
+            scene->visit();
+            rt->end();
             SpoutLife::send();
+
+            // Screen capture: draw normally
+            cocos2d::CCDirector::drawScene();
             return;
         }
 
