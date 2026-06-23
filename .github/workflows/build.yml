@@ -50,3 +50,17 @@ jobs:
         with:
           name: Build Output
           path: ${{ steps.build.outputs.build-output }}
+
+      - name: Update Development Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: andelf/nightly-release@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: dev-build
+          name: 'Development Build'
+          body: |
+            Automatic build from latest commit (${{ github.sha }}).
+            Download the `.geode` file below.
+          files: |
+            ${{ steps.build.outputs.build-output }}/*.geode
