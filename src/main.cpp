@@ -92,7 +92,7 @@ class $modify(LayoutGameObject, GameObject) {
         setColor({255, 255, 255});
 
         // If the object has a detail sprite, paint it white too.
-        cocos2d::CCSprite* detail = m_detailColorSprite;
+        cocos2d::CCSprite* detail = m_colorSprite;
         const bool hasDetail = (detail != nullptr);
         const cocos2d::ccColor3B detailColor = hasDetail ? detail->getColor() : cocos2d::ccColor3B{};
         if (hasDetail) detail->setColor({255, 255, 255});
