@@ -16,6 +16,11 @@ static constexpr cocos2d::ccColor3B LAYOUT_MG    = { 40, 125, 255};
 
 static cocos2d::CCGLProgram* g_layoutShader = nullptr;
 
+namespace DualRender {
+    extern bool s_inPlayLayer;
+}
+bool DualRender::s_inPlayLayer = false;
+
 void initLayoutShader() {
     if (g_layoutShader) return;
     g_layoutShader = new cocos2d::CCGLProgram();
@@ -178,6 +183,10 @@ namespace LayoutLook {
             c.node->setColor(c.origColor);
         }
     }
+
+    static void clear() {
+        g_cachedNodes.clear();
+    }
 }
 
 // ============================================================
@@ -250,6 +259,7 @@ class $modify(DualMenuLayer, MenuLayer) {
 class $modify(DualPlayLayer, PlayLayer) {
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
         LayoutFastSwapper::clear();
+        DualRender::s_inPlayLayer = true;
         
         // Ensure Spout is alive if started from somewhere else directly
         if (!DualRender::s_active && Mod::get()->getSettingValue<bool>("enabled")) {
@@ -277,7 +287,9 @@ class $modify(DualPlayLayer, PlayLayer) {
     }
 
     void onQuit() {
+        DualRender::s_inPlayLayer = false;
         LayoutFastSwapper::clear();
+        LayoutLook::clear();
         PlayLayer::onQuit();
     }
     
@@ -299,7 +311,7 @@ class $modify(DualDirector, cocos2d::CCDirector) {
         }
 
         auto* scene = getRunningScene();
-        auto* pl    = PlayLayer::get();
+        auto* pl    = DualRender::s_inPlayLayer ? PlayLayer::get() : nullptr;
         auto* rt    = DualRender::s_rt;
 
         if (!scene || !rt || !DualRender::s_spoutInitialized) {
@@ -355,9 +367,23 @@ class $modify(DualDirector, cocos2d::CCDirector) {
         DualRender::s_isLayoutPass = false;
         rt->beginWithClear(0.f, 0.f, 0.f, 1.f, 1.f, 0);
         
-        // We use scene->visit() instead of pl->visit() so that Pause Menus, 
-        // End Screens, and UI elements appear correctly in OBS.
-        scene->visit(); 
+        // Optimize FPS: Only visit PlayLayer and necessary standard UI layers.
+        // We AVOID scene->visit() to skip rendering 70+ mod overlays twice.
+        if (pl) pl->visit();
+
+        if (scene) {
+            auto children = scene->getChildren();
+            if (children) {
+                for (int i = 0; i < children->count(); i++) {
+                    auto child = static_cast<cocos2d::CCNode*>(children->objectAtIndex(i));
+                    if (child == pl) continue;
+                    
+                    if (dynamic_cast<PauseLayer*>(child) || dynamic_cast<EndLevelLayer*>(child)) {
+                        child->visit();
+                    }
+                }
+            }
+        }
         
         rt->end();
         SpoutLife::send();
