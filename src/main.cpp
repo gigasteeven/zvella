@@ -23,8 +23,6 @@ namespace DualRender {
 }
 bool DualRender::s_inPlayLayer = false;
 static cocos2d::CCLayerColor* g_solidBg = nullptr;
-static PauseLayer* g_pauseLayer = nullptr;
-static EndLevelLayer* g_endLevelLayer = nullptr;
 
 void initLayoutShader() {
     if (g_layoutShader) return;
@@ -277,31 +275,6 @@ class $modify(DualMenuLayer, MenuLayer) {
 };
 
 // ============================================================
-// UI Hooks (O(1) Pause Menu Tracking)
-// ============================================================
-class $modify(DualPauseLayer, PauseLayer) {
-    void customSetup() {
-        PauseLayer::customSetup();
-        g_pauseLayer = this;
-    }
-    void onExit() {
-        g_pauseLayer = nullptr;
-        PauseLayer::onExit();
-    }
-};
-
-class $modify(DualEndLevelLayer, EndLevelLayer) {
-    void showLayer(bool p0) {
-        EndLevelLayer::showLayer(p0);
-        g_endLevelLayer = this;
-    }
-    void onExit() {
-        g_endLevelLayer = nullptr;
-        EndLevelLayer::onExit();
-    }
-};
-
-// ============================================================
 // PlayLayer
 // ============================================================
 class $modify(DualPlayLayer, PlayLayer) {
@@ -423,8 +396,19 @@ class $modify(DualDirector, cocos2d::CCDirector) {
             if (pl->m_background) pl->m_background->setVisible(false);
         }
 
-        if (g_pauseLayer) g_pauseLayer->visit();
-        if (g_endLevelLayer) g_endLevelLayer->visit();
+        if (scene) {
+            auto children = scene->getChildren();
+            if (children) {
+                for (int i = 0; i < children->count(); i++) {
+                    auto child = static_cast<cocos2d::CCNode*>(children->objectAtIndex(i));
+                    if (child == pl) continue;
+                    
+                    if (typeinfo_cast<PauseLayer*>(child) || typeinfo_cast<EndLevelLayer*>(child)) {
+                        child->visit();
+                    }
+                }
+            }
+        }
         
         rt->end();
         SpoutLife::send();
