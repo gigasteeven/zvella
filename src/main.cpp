@@ -1,7 +1,6 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/CCDirector.hpp>
-#include <chrono>
 
 #include "DualRender.hpp"
 #include "LayoutConfig.hpp"
@@ -20,7 +19,6 @@ void initLayoutShader() {
     if (g_layoutShader) return;
     g_layoutShader = new cocos2d::CCGLProgram();
     
-    // Exact Eclipse Layout look: Ignore level colors, render raw texture.
     const GLchar* fragSource = R"(
         #ifdef GL_ES
         precision mediump float;
@@ -35,8 +33,6 @@ void initLayoutShader() {
         }
     )";
     
-    // FIXED: Must use CC_MVPMatrix for the camera to move properly!
-    // Using CC_PMatrix caused the "static overlay" bug.
     const GLchar* vertSource = R"(
         attribute vec4 a_position;
         attribute vec2 a_texCoord;
@@ -61,21 +57,23 @@ void initLayoutShader() {
 }
 
 // ============================================================
-// LayoutFastSwapper
+// LayoutFastSwapper (OPTIMIZED - ZERO dynamic_casts per frame)
 // ============================================================
 namespace LayoutFastSwapper {
     static std::vector<GameObject*> g_decorations;
     
-    struct SavedShader { cocos2d::CCNode* node; cocos2d::CCGLProgram* shader; };
-    static std::vector<SavedShader> g_savedShaders;
-    
-    struct SavedVisibility { cocos2d::CCNode* node; bool visible; };
-    static std::vector<SavedVisibility> g_savedGlowNodes;
+    struct BatchNodeData {
+        cocos2d::CCSpriteBatchNode* node;
+        cocos2d::CCGLProgram* origShader;
+        bool isGlow;
+    };
+    static std::vector<BatchNodeData> g_batchNodes;
+    static bool s_isCached = false;
 
     void clear() {
         g_decorations.clear();
-        g_savedShaders.clear();
-        g_savedGlowNodes.clear();
+        g_batchNodes.clear();
+        s_isCached = false;
     }
 
     void tryAdd(GameObject* obj) {
@@ -85,27 +83,30 @@ namespace LayoutFastSwapper {
         }
     }
 
-    void applyLayoutMode(PlayLayer* pl) {
-        if (!pl || !pl->m_objectLayer) return;
-
-        for (auto* obj : g_decorations) {
-            obj->setVisible(false);
-        }
-
+    void cacheBatchNodes(PlayLayer* pl) {
+        if (s_isCached || !pl || !pl->m_objectLayer) return;
         auto children = pl->m_objectLayer->getChildren();
         if (children) {
             for (int i = 0; i < children->count(); i++) {
                 auto node = static_cast<cocos2d::CCNode*>(children->objectAtIndex(i));
                 if (auto batch = dynamic_cast<cocos2d::CCSpriteBatchNode*>(node)) {
-                    cocos2d::ccBlendFunc blend = batch->getBlendFunc();
-                    if (blend.dst == GL_ONE) {
-                        g_savedGlowNodes.push_back({batch, batch->isVisible()});
-                        batch->setVisible(false);
-                    } else {
-                        g_savedShaders.push_back({batch, batch->getShaderProgram()});
-                        batch->setShaderProgram(g_layoutShader);
-                    }
+                    bool isGlow = (batch->getBlendFunc().dst == GL_ONE);
+                    g_batchNodes.push_back({batch, batch->getShaderProgram(), isGlow});
                 }
+            }
+        }
+        s_isCached = true;
+    }
+
+    void applyLayoutMode() {
+        for (auto* obj : g_decorations) {
+            obj->setVisible(false);
+        }
+        for (auto& b : g_batchNodes) {
+            if (b.isGlow) {
+                b.node->setVisible(false);
+            } else {
+                b.node->setShaderProgram(g_layoutShader);
             }
         }
     }
@@ -114,56 +115,65 @@ namespace LayoutFastSwapper {
         for (auto* obj : g_decorations) {
             obj->setVisible(true);
         }
-
-        for (auto& st : g_savedShaders) {
-            if (st.node) st.node->setShaderProgram(st.shader);
+        for (auto& b : g_batchNodes) {
+            if (b.isGlow) {
+                b.node->setVisible(true);
+            } else {
+                b.node->setShaderProgram(b.origShader);
+            }
         }
-        g_savedShaders.clear();
-
-        for (auto& st : g_savedGlowNodes) {
-            if (st.node) st.node->setVisible(st.visible);
-        }
-        g_savedGlowNodes.clear();
     }
 }
 
 // ============================================================
-// LayoutLook
+// LayoutLook (OPTIMIZED - ZERO dynamic_casts per frame)
 // ============================================================
 namespace LayoutLook {
-    struct Saved { cocos2d::CCNodeRGBA* node; cocos2d::ccColor3B color; };
-    static std::vector<Saved> g_saved;
+    struct CachedColorNode {
+        cocos2d::CCNodeRGBA* node;
+        cocos2d::ccColor3B origColor;
+        cocos2d::ccColor3B targetColor;
+    };
+    static std::vector<CachedColorNode> g_cachedNodes;
 
-    static void paint(cocos2d::CCNode* n, cocos2d::ccColor3B c) {
+    static void cacheNode(cocos2d::CCNode* n, cocos2d::ccColor3B target) {
         if (!n) return;
         if (auto* rgba = dynamic_cast<cocos2d::CCNodeRGBA*>(n)) {
-            g_saved.push_back({rgba, rgba->getColor()});
-            rgba->setColor(c);
+            g_cachedNodes.push_back({rgba, rgba->getColor(), target});
         }
     }
 
-    static void paintChildren(cocos2d::CCNode* parent, cocos2d::ccColor3B c) {
+    static void cacheChildren(cocos2d::CCNode* parent, cocos2d::ccColor3B target) {
         if (!parent || !parent->getChildren()) return;
         auto* ch = parent->getChildren();
-        for (unsigned i = 0; i < ch->count(); ++i)
-            paint(static_cast<cocos2d::CCNode*>(ch->objectAtIndex(i)), c);
+        for (unsigned i = 0; i < ch->count(); ++i) {
+            cacheNode(static_cast<cocos2d::CCNode*>(ch->objectAtIndex(i)), target);
+        }
     }
 
-    static void apply(PlayLayer* pl) {
-        g_saved.clear();
+    static void initCache(PlayLayer* pl) {
+        g_cachedNodes.clear();
         if (!pl) return;
-        paint(pl->m_background, LAYOUT_BG);
-        paint(pl->m_groundLayer, LAYOUT_GROUND);
-        paintChildren(pl->m_groundLayer, LAYOUT_GROUND);
-        paint(pl->m_groundLayer2, LAYOUT_GROUND);
-        paintChildren(pl->m_groundLayer2, LAYOUT_GROUND);
-        paint(pl->m_middleground, LAYOUT_MG);
-        paintChildren(pl->m_middleground, LAYOUT_MG);
+        cacheNode(pl->m_background, LAYOUT_BG);
+        cacheNode(pl->m_groundLayer, LAYOUT_GROUND);
+        cacheChildren(pl->m_groundLayer, LAYOUT_GROUND);
+        cacheNode(pl->m_groundLayer2, LAYOUT_GROUND);
+        cacheChildren(pl->m_groundLayer2, LAYOUT_GROUND);
+        cacheNode(pl->m_middleground, LAYOUT_MG);
+        cacheChildren(pl->m_middleground, LAYOUT_MG);
+    }
+
+    static void apply() {
+        for (auto& c : g_cachedNodes) {
+            c.origColor = c.node->getColor(); // In case game logic changed it
+            c.node->setColor(c.targetColor);
+        }
     }
 
     static void restore() {
-        for (auto& s : g_saved) if (s.node) s.node->setColor(s.color);
-        g_saved.clear();
+        for (auto& c : g_cachedNodes) {
+            c.node->setColor(c.origColor);
+        }
     }
 }
 
@@ -222,6 +232,8 @@ class $modify(DualPlayLayer, PlayLayer) {
             SpoutLife::start(w, h);
             DualRender::s_active = true;
             
+            LayoutLook::initCache(this);
+            
             if (Loader::get()->isModLoaded("eclipse.layoutmode") || Loader::get()->isModLoaded("eclipse")) {
                 log::warn("ECLIPSE LAYOUT MODE DETECTED! Disable it for OBS bypass to work!");
             }
@@ -244,6 +256,8 @@ class $modify(DualPlayLayer, PlayLayer) {
     void resetLevel() {
         LayoutFastSwapper::restoreOriginalMode();
         PlayLayer::resetLevel();
+        // Re-cache look nodes in case pointers changed
+        LayoutLook::initCache(this);
     }
 };
 
@@ -262,8 +276,9 @@ class $modify(DualDirector, cocos2d::CCDirector) {
         auto* rt    = DualRender::s_rt;
 
         if (!scene || !rt || !DualRender::s_spoutInitialized) {
-            LayoutFastSwapper::applyLayoutMode(pl);
-            LayoutLook::apply(pl);
+            LayoutFastSwapper::cacheBatchNodes(pl);
+            LayoutFastSwapper::applyLayoutMode();
+            LayoutLook::apply();
             cocos2d::CCDirector::drawScene();
             LayoutLook::restore();
             LayoutFastSwapper::restoreOriginalMode();
@@ -282,6 +297,9 @@ class $modify(DualDirector, cocos2d::CCDirector) {
             if (!rt) { cocos2d::CCDirector::drawScene(); return; }
         }
 
+        // Cache batch nodes once per level play
+        LayoutFastSwapper::cacheBatchNodes(pl);
+
         // ─── PASS 1: Clean render → texture → Spout (for OBS) ───
         DualRender::s_isLayoutPass = false;
         rt->beginWithClear(0.f, 0.f, 0.f, 1.f, 1.f, 0);
@@ -292,8 +310,8 @@ class $modify(DualDirector, cocos2d::CCDirector) {
         // ─── PASS 2: Layout mode → screen (for player) ───
         DualRender::s_isLayoutPass = true;
         
-        LayoutFastSwapper::applyLayoutMode(pl);
-        LayoutLook::apply(pl);
+        LayoutFastSwapper::applyLayoutMode();
+        LayoutLook::apply();
 
         cocos2d::CCDirector::drawScene();
 
@@ -305,5 +323,5 @@ class $modify(DualDirector, cocos2d::CCDirector) {
 };
 
 $on_mod(Loaded) {
-    log::info("Layout Mode OBS Bypass Shader Edition V2 loaded!");
+    log::info("Layout Mode OBS Bypass 240FPS Edition loaded!");
 }
