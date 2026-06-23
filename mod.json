@@ -21,6 +21,18 @@
 			"description": "Name of the Spout2 sender (use this in OBS Spout2 Capture)",
 			"type": "string",
 			"default": "GD_Clean"
+		},
+		"obs-fps": {
+			"name": "OBS Render FPS Limit",
+			"description": "Limit the clean OBS render to a specific FPS to save performance (0 = unlimited). Useful if you play at 240/360fps but stream at 60fps.",
+			"type": "int",
+			"default": 60
+		},
+		"layout-remove-glow": {
+			"name": "Remove Glow in Layout Mode",
+			"description": "Dynamically hide glow from objects in the screen pass (slightly lowers FPS).",
+			"type": "bool",
+			"default": true
 		}
 	}
 }

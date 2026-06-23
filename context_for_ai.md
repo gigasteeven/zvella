@@ -1,18 +1,26 @@
-# Context: Layout Mode OBS Bypass — Updated
+# Context: Layout Mode OBS Bypass — Ultimate Version
 
-## What Changed (latest rewrite)
+## The Conflict
+To achieve **Exact Eclipse Layout Mode**, we must structurally modify `GameObject` properties (colors, glow, opacity, particles).
+However, modifying these permanently ruins the "Clean" OBS pass.
+But doing it dynamically (swapping back and forth twice a frame) causes massive VBO rebuilds in Cocos2d-x, destroying FPS.
 
-### Root Cause of Previous Bug
-`GameObject::visit()` hook did NOT work for hiding decorations because GD uses **CCSpriteBatchNode** for batch rendering. In batch mode, individual sprite `visit()` calls don't control drawing — the batch node renders all children together. Our `return` in `visit()` had zero effect.
+## The Solution: Asymmetric Dual Rendering
+1. **The Game State is Layout Mode by Default:** We apply the full Layout Mode structural changes to all objects. Most of the time (e.g., 240 FPS), the game just renders this Layout Mode to the screen. Zero overhead.
+2. **The OBS Pass is Rate-Limited:** We limit the OBS render to 60 FPS (or whatever is set in mod.json). 
+3. **The Swap (Only during OBS frames):** When an OBS frame is due (e.g., 60 times a second):
+   - We **Restore** all original colors/glow/decorations to the objects.
+   - We render the scene to the `CCRenderTexture` for OBS.
+   - We immediately **Re-apply** the Layout Mode properties.
+   
+This means the expensive VBO rebuild only happens 60 times a second, NOT 480 times a second. The player gets a buttery smooth 240+ FPS on their screen with perfect Layout Mode, while OBS gets a perfectly clean 60 FPS capture.
 
-### New Approach: setVisible() + addObject cache
-1. **`PlayLayer::addObject` hook** — every object added to the level is checked against the decoration list (`LayoutConfig::isDecoration`). Decorations are cached in `DecoCache::g_objects`.
-2. **Before layout pass** (screen): `DecoCache::hide()` sets `setVisible(false)` on ALL cached decorations. `setVisible(false)` IS respected by CCSpriteBatchNode.
-3. **After layout pass**: `DecoCache::show()` restores visibility.
-4. **BG/Ground colors**: `LayoutLook::apply()` temporarily recolors background/ground nodes, `LayoutLook::restore()` puts them back.
-
-### Remaining Potential Issues
-1. **Glow removal**: Not implemented yet. Non-decoration objects still show glow in layout pass. Could be added by iterating objects and temporarily setting `m_hasNoGlow = true`.
-2. **`m_background`, `m_groundLayer`, `m_groundLayer2`, `m_middleground`**: These member names are from Geode bindings. If they don't exist or are named differently in GD 2.2081 bindings, compilation will fail. Check the bindings.
-3. **Spout2 sender**: Must verify `CreateSender` actually succeeds. Check Geode console logs for "Spout 'GD_Clean' ready" vs "Spout 'GD_Clean' FAILED".
-4. **User MUST disable Eclipse's Layout Mode** — Eclipse modifies objects destructively at creation time, which makes our clean pass also show layout mode.
+## Implementation details to fix in main.cpp
+- Keep the `PlayLayer::addObject` hook to cache objects.
+- Create a `struct ObjectOriginalState` to store `m_hasNoGlow`, `baseColor`, `detailColor`, `opacity`, `isVisible()`.
+- Create `LayoutStateSwapper::applyLayout(obj)` and `LayoutStateSwapper::restoreOriginal(obj)`.
+- In `drawScene`, check the `obs-fps` timer. If it's time for an OBS frame:
+  1. `LayoutStateSwapper::restoreAll()`
+  2. Render to FBO -> Spout
+  3. `LayoutStateSwapper::applyAll()`
+- Render to screen (which is always in Layout state).
