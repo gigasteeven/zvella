@@ -29,7 +29,9 @@ void initLayoutShader() {
         void main()
         {
             vec4 texColor = texture2D(CC_Texture0, v_texCoord);
-            gl_FragColor = vec4(texColor.rgb, texColor.a * v_fragmentColor.a);
+            // Cocos2d-x uses Premultiplied Alpha! We MUST multiply RGB by Alpha.
+            // This fixes the "sharp color changes" (blown out edges when fading).
+            gl_FragColor = vec4(texColor.rgb * v_fragmentColor.a, texColor.a * v_fragmentColor.a);
         }
     )";
     
