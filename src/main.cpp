@@ -73,67 +73,97 @@ void initLayoutShader() {
 }
 
 // ============================================================
-// LayoutFastSwapper (OPTIMIZED)
+// LayoutLayerManager (Option 1: Batch Node Splitting)
 // ============================================================
-namespace LayoutFastSwapper {
-    static std::vector<GameObject*> g_decorations;
-    
-    struct BatchNodeData {
+namespace LayoutLayerManager {
+    struct BatchData {
         cocos2d::CCSpriteBatchNode* node;
         cocos2d::CCGLProgram* origShader;
         bool isGlow;
     };
-    static std::vector<BatchNodeData> g_batchNodes;
+    static std::vector<BatchData> g_decoBatches;
+    static std::vector<BatchData> g_layoutBatches;
+    static std::map<cocos2d::CCSpriteBatchNode*, cocos2d::CCSpriteBatchNode*> g_batchMap;
     static bool s_isCached = false;
 
     void clear() {
-        g_decorations.clear();
-        g_batchNodes.clear();
+        g_decoBatches.clear();
+        g_layoutBatches.clear();
+        g_batchMap.clear();
         s_isCached = false;
     }
 
-    void tryAdd(GameObject* obj) {
-        if (!obj) return;
-        int id = obj->m_objectID;
-        
-        if (XDBot::decoObjectIDs.contains(id)) {
-            bool isImportant = false;
-            if (obj->m_groups) {
-                for (int i = 0; i < obj->m_groupCount; ++i) {
-                    if (XDBot::LayoutMode::s_importantGroups.contains(obj->m_groups->at(i))) {
-                        isImportant = true;
-                        break;
-                    }
-                }
-            }
-            if (!isImportant) {
-                g_decorations.push_back(obj);
-            }
-        } else if (XDBot::solidObjectIDs.contains(id) && obj->getScale() <= 0.f) {
-            g_decorations.push_back(obj);
-        }
-    }
-
-    void cacheBatchNodes(PlayLayer* pl) {
+    void initBatchNodes(PlayLayer* pl) {
         if (s_isCached || !pl || !pl->m_objectLayer) return;
+
         auto children = pl->m_objectLayer->getChildren();
-        if (children) {
-            for (int i = 0; i < children->count(); i++) {
-                auto node = static_cast<cocos2d::CCNode*>(children->objectAtIndex(i));
-                if (auto batch = dynamic_cast<cocos2d::CCSpriteBatchNode*>(node)) {
-                    bool isGlow = (batch->getBlendFunc().dst == GL_ONE);
-                    g_batchNodes.push_back({batch, batch->getShaderProgram(), isGlow});
-                }
+        if (!children) return;
+
+        std::vector<cocos2d::CCSpriteBatchNode*> origBatches;
+        for (int i = 0; i < children->count(); ++i) {
+            if (auto batch = typeinfo_cast<cocos2d::CCSpriteBatchNode*>(children->objectAtIndex(i))) {
+                origBatches.push_back(batch);
             }
+        }
+
+        for (auto batch : origBatches) {
+            auto newBatch = cocos2d::CCSpriteBatchNode::createWithTexture(batch->getTexture(), 29);
+            newBatch->setBlendFunc(batch->getBlendFunc());
+            newBatch->setZOrder(batch->getZOrder());
+            
+            bool isGlow = (batch->getBlendFunc().dst == GL_ONE);
+            
+            g_decoBatches.push_back({batch, batch->getShaderProgram(), isGlow});
+            g_layoutBatches.push_back({newBatch, batch->getShaderProgram(), isGlow});
+            g_batchMap[batch] = newBatch;
+            
+            pl->m_objectLayer->addChild(newBatch);
         }
         s_isCached = true;
     }
 
-    void applyLayoutMode() {
-        for (auto* obj : g_decorations) {
-            obj->setVisible(false);
+    void tryAdd(GameObject* obj, PlayLayer* pl) {
+        if (!obj || !pl) return;
+        initBatchNodes(pl);
+
+        int id = obj->m_objectID;
+        
+        bool isDeco = XDBot::decoObjectIDs.contains(id) || obj->m_objectType == GameObjectType::Decoration;
+        bool isImportantDeco = false;
+        if (isDeco && obj->m_groups) {
+            for (int i = 0; i < obj->m_groupCount; ++i) {
+                if (XDBot::LayoutMode::s_importantGroups.contains(obj->m_groups->at(i))) {
+                    isImportantDeco = true;
+                    break;
+                }
+            }
         }
-        for (auto& b : g_batchNodes) {
+
+        bool isHiddenSolid = (XDBot::solidObjectIDs.contains(id) && obj->getScale() <= 0.f);
+
+        bool shouldShowInLayout = true;
+        if (isDeco && !isImportantDeco) {
+            shouldShowInLayout = false; // Pure decoration -> stay in deco batch (hidden in layout)
+        } else if (isHiddenSolid) {
+            shouldShowInLayout = false; // Hidden solid -> stay in deco batch (hidden in layout)
+        }
+
+        if (shouldShowInLayout) {
+            auto parentBatch = typeinfo_cast<cocos2d::CCSpriteBatchNode*>(obj->getParent());
+            if (parentBatch && g_batchMap.contains(parentBatch)) {
+                obj->retain();
+                obj->removeFromParentAndCleanup(false);
+                g_batchMap[parentBatch]->addChild(obj);
+                obj->release();
+            }
+        }
+    }
+
+    void applyLayoutMode() {
+        for (auto& b : g_decoBatches) {
+            b.node->setVisible(false);
+        }
+        for (auto& b : g_layoutBatches) {
             if (b.isGlow) {
                 b.node->setVisible(false);
             } else {
@@ -143,10 +173,10 @@ namespace LayoutFastSwapper {
     }
 
     void restoreOriginalMode() {
-        for (auto* obj : g_decorations) {
-            obj->setVisible(true);
+        for (auto& b : g_decoBatches) {
+            b.node->setVisible(true);
         }
-        for (auto& b : g_batchNodes) {
+        for (auto& b : g_layoutBatches) {
             if (b.isGlow) {
                 b.node->setVisible(true);
             } else {
@@ -298,7 +328,7 @@ class $modify(PlayLayer) {
         }
         DualRender::s_inPlayLayer = true;
         DualRender::s_active = true;
-        LayoutFastSwapper::clear();
+        LayoutLayerManager::clear();
         bool ret = PlayLayer::init(level, useReplay, dontCreateObjects);
         LayoutLook::initCache(this);
         return ret;
@@ -306,18 +336,18 @@ class $modify(PlayLayer) {
 
     void addObject(GameObject* obj) {
         PlayLayer::addObject(obj);
-        LayoutFastSwapper::tryAdd(obj);
+        LayoutLayerManager::tryAdd(obj, this);
     }
 
     void onQuit() {
         DualRender::s_inPlayLayer = false;
-        LayoutFastSwapper::clear();
+        LayoutLayerManager::clear();
         LayoutLook::clear();
         PlayLayer::onQuit();
     }
     
     void resetLevel() {
-        LayoutFastSwapper::restoreOriginalMode();
+        LayoutLayerManager::restoreOriginalMode();
         PlayLayer::resetLevel();
         LayoutLook::initCache(this);
     }
@@ -339,13 +369,13 @@ class $modify(DualDirector, cocos2d::CCDirector) {
 
         if (!scene || !rt || !DualRender::s_spoutInitialized) {
             if (pl) {
-                LayoutFastSwapper::applyLayoutMode();
+                LayoutLayerManager::applyLayoutMode();
                 LayoutLook::apply();
             }
             cocos2d::CCDirector::drawScene();
             if (pl) {
                 LayoutLook::restore();
-                LayoutFastSwapper::restoreOriginalMode();
+                LayoutLayerManager::restoreOriginalMode();
             }
             return;
         }
@@ -412,17 +442,15 @@ class $modify(DualDirector, cocos2d::CCDirector) {
         rt->end();
         SpoutLife::send();
 
-        // ─── PASS 2: Layout mode → screen (for player) ───
+        // ─── PASS 2: Layout mode render → Screen (for Player) ───
         DualRender::s_isLayoutPass = true;
-        
-        LayoutFastSwapper::applyLayoutMode();
+        LayoutLayerManager::applyLayoutMode();
         LayoutLook::apply();
 
         cocos2d::CCDirector::drawScene();
 
         LayoutLook::restore();
-        LayoutFastSwapper::restoreOriginalMode();
-        
+        LayoutLayerManager::restoreOriginalMode();
         DualRender::s_isLayoutPass = false;
     }
 };
