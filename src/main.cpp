@@ -20,6 +20,9 @@ namespace DualRender {
     extern bool s_inPlayLayer;
 }
 bool DualRender::s_inPlayLayer = false;
+static cocos2d::CCLayerColor* g_solidBg = nullptr;
+static PauseLayer* g_pauseLayer = nullptr;
+static EndLevelLayer* g_endLevelLayer = nullptr;
 
 void initLayoutShader() {
     if (g_layoutShader) return;
@@ -134,7 +137,7 @@ namespace LayoutFastSwapper {
 }
 
 // ============================================================
-// LayoutLook (OPTIMIZED)
+// LayoutLook (OPTIMIZED - Solid Background Replacement)
 // ============================================================
 namespace LayoutLook {
     struct CachedColorNode {
@@ -162,7 +165,18 @@ namespace LayoutLook {
     static void initCache(PlayLayer* pl) {
         g_cachedNodes.clear();
         if (!pl) return;
-        cacheNode(pl->m_background, LAYOUT_BG);
+        
+        // Hide original background completely and overlay a perfect solid blue layer
+        if (pl->m_background) {
+            pl->m_background->setVisible(false);
+        }
+        if (!g_solidBg) {
+            g_solidBg = cocos2d::CCLayerColor::create(cocos2d::ccc4(LAYOUT_BG.r, LAYOUT_BG.g, LAYOUT_BG.b, 255));
+            g_solidBg->setZOrder(-100);
+            pl->addChild(g_solidBg);
+            g_solidBg->retain();
+        }
+
         cacheNode(pl->m_groundLayer, LAYOUT_GROUND);
         cacheChildren(pl->m_groundLayer, LAYOUT_GROUND);
         cacheNode(pl->m_groundLayer2, LAYOUT_GROUND);
@@ -172,6 +186,7 @@ namespace LayoutLook {
     }
 
     static void apply() {
+        if (g_solidBg) g_solidBg->setVisible(true);
         for (auto& c : g_cachedNodes) {
             c.origColor = c.node->getColor();
             c.node->setColor(c.targetColor);
@@ -179,6 +194,7 @@ namespace LayoutLook {
     }
 
     static void restore() {
+        if (g_solidBg) g_solidBg->setVisible(false);
         for (auto& c : g_cachedNodes) {
             c.node->setColor(c.origColor);
         }
@@ -186,6 +202,11 @@ namespace LayoutLook {
 
     static void clear() {
         g_cachedNodes.clear();
+        if (g_solidBg) {
+            if (g_solidBg->getParent()) g_solidBg->removeFromParent();
+            g_solidBg->release();
+            g_solidBg = nullptr;
+        }
     }
 }
 
@@ -238,7 +259,7 @@ class $modify(DualMenuLayer, MenuLayer) {
                 int h = static_cast<int>(ws.height);
 
                 DualRender::s_rt = cocos2d::CCRenderTexture::create(
-                    w, h, cocos2d::kCCTexture2DPixelFormat_RGBA8888);
+                    w, h, cocos2d::kCCTexture2DPixelFormat_RGBA8888, GL_DEPTH24_STENCIL8);
                 if (DualRender::s_rt) DualRender::s_rt->retain();
 
                 SpoutLife::start(w, h);
@@ -250,6 +271,32 @@ class $modify(DualMenuLayer, MenuLayer) {
             }
         }
         return true;
+    }
+};
+
+// ============================================================
+// UI Hooks (O(1) Pause Menu Tracking)
+// ============================================================
+class $modify(DualPauseLayer, PauseLayer) {
+    bool init(bool p0) {
+        if (!PauseLayer::init(p0)) return false;
+        g_pauseLayer = this;
+        return true;
+    }
+    void onExit() {
+        g_pauseLayer = nullptr;
+        PauseLayer::onExit();
+    }
+};
+
+class $modify(DualEndLevelLayer, EndLevelLayer) {
+    void showLayer(bool p0) {
+        EndLevelLayer::showLayer(p0);
+        g_endLevelLayer = this;
+    }
+    void onExit() {
+        g_endLevelLayer = nullptr;
+        EndLevelLayer::onExit();
     }
 };
 
@@ -267,7 +314,7 @@ class $modify(DualPlayLayer, PlayLayer) {
             auto ws = cocos2d::CCDirector::sharedDirector()->getWinSizeInPixels();
             int w = static_cast<int>(ws.width);
             int h = static_cast<int>(ws.height);
-            DualRender::s_rt = cocos2d::CCRenderTexture::create(w, h, cocos2d::kCCTexture2DPixelFormat_RGBA8888);
+            DualRender::s_rt = cocos2d::CCRenderTexture::create(w, h, cocos2d::kCCTexture2DPixelFormat_RGBA8888, GL_DEPTH24_STENCIL8);
             if (DualRender::s_rt) DualRender::s_rt->retain();
             SpoutLife::start(w, h);
             DualRender::s_active = true;
@@ -336,7 +383,7 @@ class $modify(DualDirector, cocos2d::CCDirector) {
         if (w != DualRender::s_width || h != DualRender::s_height) {
             SpoutLife::stop();
             SpoutLife::start(w, h);
-            DualRender::s_rt = cocos2d::CCRenderTexture::create(w, h, cocos2d::kCCTexture2DPixelFormat_RGBA8888);
+            DualRender::s_rt = cocos2d::CCRenderTexture::create(w, h, cocos2d::kCCTexture2DPixelFormat_RGBA8888, GL_DEPTH24_STENCIL8);
             if (DualRender::s_rt) DualRender::s_rt->retain();
             rt = DualRender::s_rt;
             if (!rt) { cocos2d::CCDirector::drawScene(); return; }
@@ -369,21 +416,14 @@ class $modify(DualDirector, cocos2d::CCDirector) {
         
         // Optimize FPS: Only visit PlayLayer and necessary standard UI layers.
         // We AVOID scene->visit() to skip rendering 70+ mod overlays twice.
-        if (pl) pl->visit();
-
-        if (scene) {
-            auto children = scene->getChildren();
-            if (children) {
-                for (int i = 0; i < children->count(); i++) {
-                    auto child = static_cast<cocos2d::CCNode*>(children->objectAtIndex(i));
-                    if (child == pl) continue;
-                    
-                    if (dynamic_cast<PauseLayer*>(child) || dynamic_cast<EndLevelLayer*>(child)) {
-                        child->visit();
-                    }
-                }
-            }
+        if (pl) {
+            if (pl->m_background) pl->m_background->setVisible(true);
+            pl->visit();
+            if (pl->m_background) pl->m_background->setVisible(false);
         }
+
+        if (g_pauseLayer) g_pauseLayer->visit();
+        if (g_endLevelLayer) g_endLevelLayer->visit();
         
         rt->end();
         SpoutLife::send();
