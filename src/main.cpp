@@ -69,49 +69,70 @@ namespace SolidBackground {
 // UI/HUD nodes are NOT GameObjects, so they are never touched here — they
 // appear unchanged in both passes, exactly as required.
 // ============================================================
-class $modify(LayoutGameObject, GameObject) {
-    void visit() {
-        // Only interfere during the layout pass and only when we're actively
-        // dual-rendering a PlayLayer.
-        if (!DualRender::s_isLayoutPass || !DualRender::s_inPlayLayer) {
-            GameObject::visit();
-            return;
+namespace LayoutState {
+    struct ObjState {
+        GameObject* obj;
+        bool isDecoration;
+        
+        cocos2d::ccColor3B color;
+        cocos2d::ccColor3B detailColor;
+        int activeMainColorID;
+        int activeDetailColorID;
+        bool baseUsesHSV;
+        bool detailUsesHSV;
+        bool hasNoGlow;
+        bool visible;
+        bool glowVisible;
+    };
+    
+    inline std::vector<ObjState> objects;
+    inline bool layoutApplied = false;
+
+    static void applyLayout() {
+        if (layoutApplied) return;
+        for (auto& st : objects) {
+            st.color = st.obj->getColor();
+            st.activeMainColorID = st.obj->m_activeMainColorID;
+            st.activeDetailColorID = st.obj->m_activeDetailColorID;
+            st.baseUsesHSV = st.obj->m_baseUsesHSV;
+            st.detailUsesHSV = st.obj->m_detailUsesHSV;
+            st.hasNoGlow = st.obj->m_hasNoGlow;
+            st.visible = st.obj->isVisible();
+            if (st.obj->m_colorSprite) st.detailColor = st.obj->m_colorSprite->getColor();
+            st.glowVisible = st.obj->m_glowSprite ? st.obj->m_glowSprite->isVisible() : false;
+            
+            if (st.isDecoration) {
+                st.obj->setVisible(false);
+            } else {
+                st.obj->setColor({255, 255, 255});
+                st.obj->m_activeMainColorID = -1;
+                st.obj->m_activeDetailColorID = -1;
+                st.obj->m_baseUsesHSV = false;
+                st.obj->m_detailUsesHSV = false;
+                st.obj->m_hasNoGlow = true;
+                if (st.obj->m_colorSprite) st.obj->m_colorSprite->setColor({255, 255, 255});
+                if (st.obj->m_glowSprite) st.obj->m_glowSprite->setVisible(false);
+            }
         }
-
-        // Decorations + scaled-to-0 solids + ghost blocks + excluded triggers.
-        if (XDBot::LayoutMode::isDecoration(this)) {
-            return; // skip rendering entirely
-        }
-
-        // Save the bits of state we're about to temporarily change.
-        const cocos2d::ccColor3B baseColor     = getColor();
-        const bool hadGlow                     = !m_hasNoGlow;
-
-        // Apply layout look: solid white main color, no glow.
-        m_hasNoGlow = true;
-        setColor({255, 255, 255});
-
-        // If the object has a detail sprite, paint it white too.
-        cocos2d::CCSprite* detail = m_colorSprite;
-        const bool hasDetail = (detail != nullptr);
-        const cocos2d::ccColor3B detailColor = hasDetail ? detail->getColor() : cocos2d::ccColor3B{};
-        if (hasDetail) detail->setColor({255, 255, 255});
-
-        // If the object has a glow sprite, hide it for this frame.
-        cocos2d::CCSprite* glow = m_glowSprite;
-        const bool hasGlowSprite = (glow != nullptr);
-        const bool glowWasVisible = hasGlowSprite ? glow->isVisible() : false;
-        if (hasGlowSprite) glow->setVisible(false);
-
-        GameObject::visit(); // actually render the object
-
-        // Restore everything — the clean OBS pass next frame must see the real state.
-        setColor(baseColor);
-        m_hasNoGlow = !hadGlow;
-        if (hasDetail) detail->setColor(detailColor);
-        if (hasGlowSprite) glow->setVisible(glowWasVisible);
+        layoutApplied = true;
     }
-};
+
+    static void revertLayout() {
+        if (!layoutApplied) return;
+        for (auto& st : objects) {
+            st.obj->setColor(st.color);
+            st.obj->m_activeMainColorID = st.activeMainColorID;
+            st.obj->m_activeDetailColorID = st.activeDetailColorID;
+            st.obj->m_baseUsesHSV = st.baseUsesHSV;
+            st.obj->m_detailUsesHSV = st.detailUsesHSV;
+            st.obj->m_hasNoGlow = st.hasNoGlow;
+            st.obj->setVisible(st.visible);
+            if (st.obj->m_colorSprite) st.obj->m_colorSprite->setColor(st.detailColor);
+            if (st.obj->m_glowSprite) st.obj->m_glowSprite->setVisible(st.glowVisible);
+        }
+        layoutApplied = false;
+    }
+}
 
 // ============================================================
 // Hook: LevelTools — always consider level integrity valid when layout mode
@@ -130,6 +151,9 @@ class $modify(LayoutLevelTools, LevelTools) {
 // ============================================================
 class $modify(LayoutPlayLayer, PlayLayer) {
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
+        LayoutState::objects.clear();
+        LayoutState::layoutApplied = false;
+
         // Parse "important groups" before objects are created, so that the
         // decoration filter can preserve gameplay-critical deco objects.
         if (level && !level->m_levelString.empty()) {
@@ -144,7 +168,18 @@ class $modify(LayoutPlayLayer, PlayLayer) {
         return ok;
     }
 
+    void addObject(GameObject* obj) {
+        PlayLayer::addObject(obj);
+        if (XDBot::excludedTriggerIDs.contains(obj->m_objectID)) return;
+        LayoutState::ObjState st;
+        st.obj = obj;
+        st.isDecoration = XDBot::LayoutMode::isDecoration(obj);
+        LayoutState::objects.push_back(st);
+    }
+
     void onQuit() {
+        LayoutState::objects.clear();
+        LayoutState::layoutApplied = false;
         DualRender::s_inPlayLayer = false;
         PlayLayer::onQuit();
     }
@@ -165,11 +200,18 @@ namespace SpoutLife {
 
     static bool start(int w, int h) {
         const auto n = name();
-        const bool ok = SpoutWrapper::init(w, h, n);
+        int pxW = w;
+        int pxH = h;
+        if (DualRender::s_rt) {
+            auto tex = DualRender::s_rt->getSprite()->getTexture();
+            pxW = tex->getPixelsWide();
+            pxH = tex->getPixelsHigh();
+        }
+        const bool ok = SpoutWrapper::init(pxW, pxH, n);
         DualRender::s_width  = w;
         DualRender::s_height = h;
         DualRender::s_spoutInitialized = ok;
-        if (ok) log::info("Spout '{}' ready ({}x{})", n, w, h);
+        if (ok) log::info("Spout '{}' ready ({}x{})", n, pxW, pxH);
         else    log::error("Spout '{}' FAILED", n);
         return ok;
     }
@@ -269,16 +311,22 @@ class $modify(DualDirector, cocos2d::CCDirector) {
 
         // --- PASS 1: CLEAN → render texture → Spout (OBS) ---
         DualRender::s_isLayoutPass = false;
+        LayoutState::revertLayout(); // Ensure objects are normal
+
         rt->beginWithClear(0.f, 0.f, 0.f, 1.f, 1.f, 0);
-        scene->visit();   // the visit() hook renders everything normally here
+        scene->visit();
         rt->end();
         SpoutLife::send();
 
         // --- PASS 2: LAYOUT → default framebuffer (screen) ---
         DualRender::s_isLayoutPass = true;
+        LayoutState::applyLayout(); // Force objects into layout appearance
+
         SolidBackground::show();
-        cocos2d::CCDirector::drawScene(); // real pipeline → screen, hook filters
+        cocos2d::CCDirector::drawScene(); // real pipeline → screen
         SolidBackground::hide();
+
+        LayoutState::revertLayout(); // Revert back so game logic sees real state
         DualRender::s_isLayoutPass = false;
     }
 };
