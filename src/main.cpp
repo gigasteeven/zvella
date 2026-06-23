@@ -1,6 +1,7 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/CCDirector.hpp>
+#include <Geode/modify/MenuLayer.hpp>
 
 #include "DualRender.hpp"
 #include "LayoutConfig.hpp"
@@ -59,7 +60,7 @@ void initLayoutShader() {
 }
 
 // ============================================================
-// LayoutFastSwapper (OPTIMIZED - ZERO dynamic_casts per frame)
+// LayoutFastSwapper (OPTIMIZED)
 // ============================================================
 namespace LayoutFastSwapper {
     static std::vector<GameObject*> g_decorations;
@@ -128,7 +129,7 @@ namespace LayoutFastSwapper {
 }
 
 // ============================================================
-// LayoutLook (OPTIMIZED - ZERO dynamic_casts per frame)
+// LayoutLook (OPTIMIZED)
 // ============================================================
 namespace LayoutLook {
     struct CachedColorNode {
@@ -167,7 +168,7 @@ namespace LayoutLook {
 
     static void apply() {
         for (auto& c : g_cachedNodes) {
-            c.origColor = c.node->getColor(); // In case game logic changed it
+            c.origColor = c.node->getColor();
             c.node->setColor(c.targetColor);
         }
     }
@@ -180,7 +181,7 @@ namespace LayoutLook {
 }
 
 // ============================================================
-// Spout lifecycle
+// Spout lifecycle (Global)
 // ============================================================
 namespace SpoutLife {
     static std::string name() {
@@ -213,32 +214,59 @@ namespace SpoutLife {
 }
 
 // ============================================================
+// MenuLayer - Start Global Spout
+// ============================================================
+class $modify(DualMenuLayer, MenuLayer) {
+    bool init() {
+        if (!MenuLayer::init()) return false;
+        
+        if (Mod::get()->getSettingValue<bool>("enabled")) {
+            initLayoutShader();
+            
+            if (!DualRender::s_active) {
+                auto ws = cocos2d::CCDirector::sharedDirector()->getWinSizeInPixels();
+                int w = static_cast<int>(ws.width);
+                int h = static_cast<int>(ws.height);
+
+                DualRender::s_rt = cocos2d::CCRenderTexture::create(
+                    w, h, cocos2d::kCCTexture2DPixelFormat_RGBA8888);
+                if (DualRender::s_rt) DualRender::s_rt->retain();
+
+                SpoutLife::start(w, h);
+                DualRender::s_active = true;
+                
+                if (Loader::get()->isModLoaded("eclipse.layoutmode") || Loader::get()->isModLoaded("eclipse")) {
+                    log::warn("ECLIPSE LAYOUT MODE DETECTED! Disable it for OBS bypass to work!");
+                }
+            }
+        }
+        return true;
+    }
+};
+
+// ============================================================
 // PlayLayer
 // ============================================================
 class $modify(DualPlayLayer, PlayLayer) {
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
         LayoutFastSwapper::clear();
-        initLayoutShader();
-
-        if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
-
-        if (Mod::get()->getSettingValue<bool>("enabled")) {
+        
+        // Ensure Spout is alive if started from somewhere else directly
+        if (!DualRender::s_active && Mod::get()->getSettingValue<bool>("enabled")) {
+            initLayoutShader();
             auto ws = cocos2d::CCDirector::sharedDirector()->getWinSizeInPixels();
             int w = static_cast<int>(ws.width);
             int h = static_cast<int>(ws.height);
-
-            DualRender::s_rt = cocos2d::CCRenderTexture::create(
-                w, h, cocos2d::kCCTexture2DPixelFormat_RGBA8888);
+            DualRender::s_rt = cocos2d::CCRenderTexture::create(w, h, cocos2d::kCCTexture2DPixelFormat_RGBA8888);
             if (DualRender::s_rt) DualRender::s_rt->retain();
-
             SpoutLife::start(w, h);
             DualRender::s_active = true;
-            
+        }
+
+        if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
+
+        if (DualRender::s_active) {
             LayoutLook::initCache(this);
-            
-            if (Loader::get()->isModLoaded("eclipse.layoutmode") || Loader::get()->isModLoaded("eclipse")) {
-                log::warn("ECLIPSE LAYOUT MODE DETECTED! Disable it for OBS bypass to work!");
-            }
         }
         return true;
     }
@@ -249,22 +277,19 @@ class $modify(DualPlayLayer, PlayLayer) {
     }
 
     void onQuit() {
-        DualRender::s_active = false;
         LayoutFastSwapper::clear();
-        SpoutLife::stop();
         PlayLayer::onQuit();
     }
     
     void resetLevel() {
         LayoutFastSwapper::restoreOriginalMode();
         PlayLayer::resetLevel();
-        // Re-cache look nodes in case pointers changed
         LayoutLook::initCache(this);
     }
 };
 
 // ============================================================
-// CCDirector::drawScene
+// CCDirector::drawScene — Global Spout Architecture
 // ============================================================
 class $modify(DualDirector, cocos2d::CCDirector) {
     void drawScene() {
@@ -278,12 +303,18 @@ class $modify(DualDirector, cocos2d::CCDirector) {
         auto* rt    = DualRender::s_rt;
 
         if (!scene || !rt || !DualRender::s_spoutInitialized) {
-            LayoutFastSwapper::cacheBatchNodes(pl);
-            LayoutFastSwapper::applyLayoutMode();
-            LayoutLook::apply();
+            if (pl) {
+                LayoutFastSwapper::cacheBatchNodes(pl);
+                LayoutFastSwapper::applyLayoutMode();
+                LayoutLook::apply();
+            }
+            
             cocos2d::CCDirector::drawScene();
-            LayoutLook::restore();
-            LayoutFastSwapper::restoreOriginalMode();
+            
+            if (pl) {
+                LayoutLook::restore();
+                LayoutFastSwapper::restoreOriginalMode();
+            }
             return;
         }
 
@@ -299,13 +330,35 @@ class $modify(DualDirector, cocos2d::CCDirector) {
             if (!rt) { cocos2d::CCDirector::drawScene(); return; }
         }
 
-        // Cache batch nodes once per level play
+        // ==========================================
+        // GLOBAL CAPTURE (Menus, Editor, etc.)
+        // ==========================================
+        if (!pl) {
+            // Draw normal scene to Spout
+            DualRender::s_isLayoutPass = false;
+            rt->beginWithClear(0.f, 0.f, 0.f, 1.f, 1.f, 0);
+            scene->visit();
+            rt->end();
+            SpoutLife::send();
+
+            // Draw normal scene to Screen
+            cocos2d::CCDirector::drawScene();
+            return;
+        }
+
+        // ==========================================
+        // PLAYLAYER CAPTURE (Layout Mode Bypass)
+        // ==========================================
         LayoutFastSwapper::cacheBatchNodes(pl);
 
         // ─── PASS 1: Clean render → texture → Spout (for OBS) ───
         DualRender::s_isLayoutPass = false;
         rt->beginWithClear(0.f, 0.f, 0.f, 1.f, 1.f, 0);
-        scene->visit();
+        
+        // We use scene->visit() instead of pl->visit() so that Pause Menus, 
+        // End Screens, and UI elements appear correctly in OBS.
+        scene->visit(); 
+        
         rt->end();
         SpoutLife::send();
 
@@ -325,5 +378,5 @@ class $modify(DualDirector, cocos2d::CCDirector) {
 };
 
 $on_mod(Loaded) {
-    log::info("Layout Mode OBS Bypass 240FPS Edition loaded!");
+    log::info("Layout Mode OBS Bypass Global Edition loaded!");
 }
