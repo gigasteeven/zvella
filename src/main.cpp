@@ -280,10 +280,9 @@ class $modify(DualMenuLayer, MenuLayer) {
 // UI Hooks (O(1) Pause Menu Tracking)
 // ============================================================
 class $modify(DualPauseLayer, PauseLayer) {
-    bool init(bool p0) {
-        if (!PauseLayer::init(p0)) return false;
+    void customSetup() {
+        PauseLayer::customSetup();
         g_pauseLayer = this;
-        return true;
     }
     void onExit() {
         g_pauseLayer = nullptr;

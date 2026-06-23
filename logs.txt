@@ -1,937 +1,913 @@
-﻿2026-06-23T14:58:07.4094908Z Current runner version: '2.335.1'
-2026-06-23T14:58:07.4119673Z ##[group]Runner Image Provisioner
-2026-06-23T14:58:07.4120919Z Hosted Compute Agent
-2026-06-23T14:58:07.4121523Z Version: 20260611.554
-2026-06-23T14:58:07.4122107Z Commit: 5e0782fdc9014723d3be820dd114dd31555c2bd1
-2026-06-23T14:58:07.4122818Z Build Date: 2026-06-11T21:40:46Z
-2026-06-23T14:58:07.4123457Z Worker ID: {73a0213e-8123-4d50-8bfe-a4bd25c08fae}
-2026-06-23T14:58:07.4124130Z Azure Region: northcentralus
-2026-06-23T14:58:07.4124674Z ##[endgroup]
-2026-06-23T14:58:07.4126069Z ##[group]Operating System
-2026-06-23T14:58:07.4126717Z Microsoft Windows Server 2025
-2026-06-23T14:58:07.4127287Z 10.0.26100
-2026-06-23T14:58:07.4127769Z Datacenter
-2026-06-23T14:58:07.4128284Z ##[endgroup]
-2026-06-23T14:58:07.4128770Z ##[group]Runner Image
-2026-06-23T14:58:07.4129337Z Image: windows-2025-vs2026
-2026-06-23T14:58:07.4129904Z Version: 20260614.141.1
-2026-06-23T14:58:07.4131471Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20260614.141/images/windows/Windows2025-VS2026-Readme.md
-2026-06-23T14:58:07.4133404Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20260614.141
-2026-06-23T14:58:07.4134387Z ##[endgroup]
-2026-06-23T14:58:07.4135506Z ##[group]GITHUB_TOKEN Permissions
-2026-06-23T14:58:07.4137302Z Contents: write
-2026-06-23T14:58:07.4137853Z Metadata: read
-2026-06-23T14:58:07.4138812Z ##[endgroup]
-2026-06-23T14:58:07.4141247Z Secret source: Actions
-2026-06-23T14:58:07.4141971Z Prepare workflow directory
-2026-06-23T14:58:07.4531538Z Prepare all required actions
-2026-06-23T14:58:07.4589358Z Getting action download info
-2026-06-23T14:58:07.7001514Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
-2026-06-23T14:58:07.8226536Z Download action repository 'geode-sdk/build-geode-mod@main' (SHA:825dce8c7404aacc975db01b09c99d295680cdec)
-2026-06-23T14:58:08.1977052Z Getting action download info
-2026-06-23T14:58:08.3342667Z Download action repository 'robinraju/release-downloader@v1.9' (SHA:368754b9c6f47c345fcfbf42bcb577c2f0f5f395)
-2026-06-23T14:58:08.5595957Z Download action repository 'hendrikmuhs/ccache-action@v1' (SHA:5ebbd400eff9e74630f759d94ddd7b6c26299639)
-2026-06-23T14:58:08.7890471Z Download action repository 'actions/cache@v4' (SHA:0057852bfaa89a56745cba8c7296529d2fc39830)
-2026-06-23T14:58:08.9207915Z Download action repository 'geode-sdk/cli@main' (SHA:0a69a366e22240939dbea2dc25d9b90b22b02e52)
-2026-06-23T14:58:09.1622649Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
-2026-06-23T14:58:09.4797233Z Getting action download info
-2026-06-23T14:58:09.5890075Z Download action repository 'robinraju/release-downloader@v1.10' (SHA:c39a3b234af58f0cf85888573d361fb6fa281534)
-2026-06-23T14:58:09.9391336Z Complete job name: Windows
-2026-06-23T14:58:10.0760769Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
-2026-06-23T14:58:10.0771812Z ##[group]Run actions/checkout@v4
-2026-06-23T14:58:10.0772855Z with:
-2026-06-23T14:58:10.0773547Z   submodules: recursive
-2026-06-23T14:58:10.0774351Z   repository: gigasteeven/zvella
-2026-06-23T14:58:10.0782320Z   token: ***
-2026-06-23T14:58:10.0783013Z   ssh-strict: true
-2026-06-23T14:58:10.0783731Z   ssh-user: git
-2026-06-23T14:58:10.0784467Z   persist-credentials: true
-2026-06-23T14:58:10.0785254Z   clean: true
-2026-06-23T14:58:10.0785983Z   sparse-checkout-cone-mode: true
-2026-06-23T14:58:10.0786833Z   fetch-depth: 1
-2026-06-23T14:58:10.0787524Z   fetch-tags: false
-2026-06-23T14:58:10.0788241Z   show-progress: true
-2026-06-23T14:58:10.0789536Z   lfs: false
-2026-06-23T14:58:10.0790253Z   set-safe-directory: true
-2026-06-23T14:58:10.0791545Z ##[endgroup]
-2026-06-23T14:58:10.2371644Z Syncing repository: gigasteeven/zvella
-2026-06-23T14:58:10.2374564Z ##[group]Getting Git version info
-2026-06-23T14:58:10.2375550Z Working directory is 'D:\a\zvella\zvella'
-2026-06-23T14:58:10.3157886Z [command]"C:\Program Files\Git\bin\git.exe" version
-2026-06-23T14:58:10.8507324Z git version 2.54.0.windows.1
-2026-06-23T14:58:10.8559521Z ##[endgroup]
-2026-06-23T14:58:10.8579067Z Temporarily overriding HOME='D:\a\_temp\17f12e4e-eb5c-4a6b-bd7e-b35384518d5f' before making global git config changes
-2026-06-23T14:58:10.8581273Z Adding repository directory to the temporary git global config as a safe directory
-2026-06-23T14:58:10.8589154Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\zvella\zvella
-2026-06-23T14:58:10.8870407Z Deleting the contents of 'D:\a\zvella\zvella'
-2026-06-23T14:58:10.8876637Z ##[group]Initializing the repository
-2026-06-23T14:58:10.8884509Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\zvella\zvella
-2026-06-23T14:58:10.9503937Z Initialized empty Git repository in D:/a/zvella/zvella/.git/
-2026-06-23T14:58:10.9544818Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/gigasteeven/zvella
-2026-06-23T14:58:10.9829803Z ##[endgroup]
-2026-06-23T14:58:10.9831215Z ##[group]Disabling automatic garbage collection
-2026-06-23T14:58:10.9837190Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
-2026-06-23T14:58:11.0123011Z ##[endgroup]
-2026-06-23T14:58:11.0125034Z ##[group]Setting up auth
-2026-06-23T14:58:11.0135366Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
-2026-06-23T14:58:11.0505311Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
-2026-06-23T14:58:12.0965694Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
-2026-06-23T14:58:12.1247922Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
-2026-06-23T14:58:12.6370137Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
-2026-06-23T14:58:12.6651159Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
-2026-06-23T14:58:13.1913453Z [command]"C:\Program Files\Git\bin\git.exe" config --local http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
-2026-06-23T14:58:13.2209594Z ##[endgroup]
-2026-06-23T14:58:13.2213672Z ##[group]Fetching the repository
-2026-06-23T14:58:13.2236681Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +fc297f127d4eac8f2d530c93a99c53ef1152be51:refs/remotes/origin/main
-2026-06-23T14:58:13.9971781Z From https://github.com/gigasteeven/zvella
-2026-06-23T14:58:13.9972665Z  * [new ref]         fc297f127d4eac8f2d530c93a99c53ef1152be51 -> origin/main
-2026-06-23T14:58:14.0171048Z ##[endgroup]
-2026-06-23T14:58:14.0171718Z ##[group]Determining the checkout info
-2026-06-23T14:58:14.0175327Z ##[endgroup]
-2026-06-23T14:58:14.0185102Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
-2026-06-23T14:58:14.0501873Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
-2026-06-23T14:58:14.0784505Z ##[group]Checking out the ref
-2026-06-23T14:58:14.0793376Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B main refs/remotes/origin/main
-2026-06-23T14:58:14.1225732Z Switched to a new branch 'main'
-2026-06-23T14:58:14.1242664Z branch 'main' set up to track 'origin/main'.
-2026-06-23T14:58:14.1284220Z ##[endgroup]
-2026-06-23T14:58:14.1285851Z ##[group]Setting up auth for fetching submodules
-2026-06-23T14:58:14.1296531Z [command]"C:\Program Files\Git\bin\git.exe" config --global http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
-2026-06-23T14:58:14.1586776Z [command]"C:\Program Files\Git\bin\git.exe" config --global --unset-all url.https://github.com/.insteadOf
-2026-06-23T14:58:14.1860945Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add url.https://github.com/.insteadOf git@github.com:
-2026-06-23T14:58:14.2136713Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add url.https://github.com/.insteadOf org-286074774@github.com:
-2026-06-23T14:58:14.2410919Z ##[endgroup]
-2026-06-23T14:58:14.2411506Z ##[group]Fetching submodules
-2026-06-23T14:58:14.2419443Z [command]"C:\Program Files\Git\bin\git.exe" submodule sync --recursive
-2026-06-23T14:58:14.7776533Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 submodule update --init --force --depth=1 --recursive
-2026-06-23T14:58:15.2859745Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local gc.auto 0"
-2026-06-23T14:58:15.8110865Z ##[endgroup]
-2026-06-23T14:58:15.8111498Z ##[group]Persisting credentials for submodules
-2026-06-23T14:58:15.8123168Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'url\.https\:\/\/github\.com\/\.insteadOf' && git config --local --unset-all 'url.https://github.com/.insteadOf' || :\""
-2026-06-23T14:58:16.3168922Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local 'http.https://github.com/.extraheader' 'AUTHORIZATION: basic ***' && git config --local --show-origin --name-only --get-regexp remote.origin.url\""
-2026-06-23T14:58:16.8273221Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --add 'url.https://github.com/.insteadOf' 'git@github.com:'"
-2026-06-23T14:58:17.3329588Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --add 'url.https://github.com/.insteadOf' 'org-286074774@github.com:'"
-2026-06-23T14:58:17.8417313Z ##[endgroup]
-2026-06-23T14:58:17.8737502Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
-2026-06-23T14:58:17.8990634Z fc297f127d4eac8f2d530c93a99c53ef1152be51
-2026-06-23T14:58:17.9624114Z ##[group]Run geode-sdk/build-geode-mod@main
-2026-06-23T14:58:17.9624455Z with:
-2026-06-23T14:58:17.9624628Z   sdk: v5.7.1
-2026-06-23T14:58:17.9624803Z   combine: true
-2026-06-23T14:58:17.9624971Z   cli: latest
-2026-06-23T14:58:17.9625148Z   build-config: Release
-2026-06-23T14:58:17.9625337Z   path: ./
-2026-06-23T14:58:17.9625506Z   bindings: geode-sdk/bindings
-2026-06-23T14:58:17.9625728Z   android-min-sdk: 23
-2026-06-23T14:58:17.9625917Z   ccache-variant: default
-2026-06-23T14:58:17.9626113Z   use-cpm-cache: true
-2026-06-23T14:58:17.9626307Z   export-pdb: false
-2026-06-23T14:58:17.9626495Z   export-debug: false
-2026-06-23T14:58:17.9626690Z   use-lto: true
-2026-06-23T14:58:17.9626857Z   bundle-pdb: false
-2026-06-23T14:58:17.9627035Z   export-symbols: false
-2026-06-23T14:58:17.9627223Z ##[endgroup]
-2026-06-23T14:58:17.9841001Z ##[group]Run DEFAULT_TARGET=Win64
-2026-06-23T14:58:17.9841324Z [36;1mDEFAULT_TARGET=Win64[0m
-2026-06-23T14:58:17.9841603Z [36;1mDEFAULT_CCACHE=sccache[0m
-2026-06-23T14:58:17.9841856Z [36;1mif [ "$RUNNER_OS" = "Linux" ]; then[0m
-2026-06-23T14:58:17.9842114Z [36;1m  ID=linux[0m
-2026-06-23T14:58:17.9842311Z [36;1m  DEFAULT_TARGET=Android64[0m
-2026-06-23T14:58:17.9842568Z [36;1melif [ "$RUNNER_OS" = "Windows" ]; then[0m
-2026-06-23T14:58:17.9842819Z [36;1m  ID=win[0m
-2026-06-23T14:58:17.9842995Z [36;1m  DEFAULT_TARGET=Win64[0m
-2026-06-23T14:58:17.9843229Z [36;1melif [ "$RUNNER_OS" = "macOS" ]; then[0m
-2026-06-23T14:58:17.9843473Z [36;1m  ID=mac[0m
-2026-06-23T14:58:17.9843651Z [36;1m  DEFAULT_TARGET=MacOS[0m
-2026-06-23T14:58:17.9843868Z [36;1m  DEFAULT_CCACHE=[0m
-2026-06-23T14:58:17.9844355Z [36;1mfi[0m
-2026-06-23T14:58:17.9844537Z [36;1m[0m
-2026-06-23T14:58:17.9844767Z [36;1mCCACHE_VARIANT=default[0m
-2026-06-23T14:58:17.9845267Z [36;1mif [ "$CCACHE_VARIANT" = "default" ]; then[0m
-2026-06-23T14:58:17.9845582Z [36;1m  CCACHE_VARIANT=$DEFAULT_CCACHE[0m
-2026-06-23T14:58:17.9845889Z [36;1mfi[0m
-2026-06-23T14:58:17.9846175Z [36;1m[0m
-2026-06-23T14:58:17.9846426Z [36;1mTARGET=[0m
-2026-06-23T14:58:17.9846684Z [36;1mif [ "$TARGET" = "" ]; then[0m
-2026-06-23T14:58:17.9847044Z [36;1m  TARGET=$DEFAULT_TARGET[0m
-2026-06-23T14:58:17.9847645Z [36;1mfi[0m
-2026-06-23T14:58:17.9847809Z [36;1m[0m
-2026-06-23T14:58:17.9847990Z [36;1mif [ "$TARGET" = "Android32" ]; then[0m
-2026-06-23T14:58:17.9848256Z [36;1m  OUTPUT_ID=android32[0m
-2026-06-23T14:58:17.9848496Z [36;1melif [ "$TARGET" = "Android64" ]; then[0m
-2026-06-23T14:58:17.9848760Z [36;1m  OUTPUT_ID=android64[0m
-2026-06-23T14:58:17.9848979Z [36;1melif [ "$TARGET" = "Win64" ]; then[0m
-2026-06-23T14:58:17.9849223Z [36;1m  OUTPUT_ID=win[0m
-2026-06-23T14:58:17.9849430Z [36;1melif [ "$TARGET" = "MacOS" ]; then[0m
-2026-06-23T14:58:17.9849671Z [36;1m  OUTPUT_ID=mac[0m
-2026-06-23T14:58:17.9849872Z [36;1melif [ "$TARGET" = "iOS" ]; then[0m
-2026-06-23T14:58:17.9850106Z [36;1m  OUTPUT_ID=ios[0m
-2026-06-23T14:58:17.9850289Z [36;1mfi[0m
-2026-06-23T14:58:17.9850432Z [36;1m[0m
-2026-06-23T14:58:17.9850591Z [36;1mecho "id=$ID" >> $GITHUB_OUTPUT[0m
-2026-06-23T14:58:17.9850858Z [36;1mecho "target=$TARGET" >> $GITHUB_OUTPUT[0m
-2026-06-23T14:58:17.9851166Z [36;1mecho "target_id=$OUTPUT_ID" >> $GITHUB_OUTPUT[0m
-2026-06-23T14:58:17.9851614Z [36;1mecho "ccache_variant=$CCACHE_VARIANT" >> $GITHUB_OUTPUT[0m
-2026-06-23T14:58:17.9867414Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
-2026-06-23T14:58:17.9868061Z ##[endgroup]
-2026-06-23T14:58:18.0523042Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
-2026-06-23T14:58:18.0525583Z ##[group]Run hendrikmuhs/ccache-action@v1
-2026-06-23T14:58:18.0525831Z with:
-2026-06-23T14:58:18.0527753Z   variant: sccache
-2026-06-23T14:58:18.0527993Z   key: win-v1
-2026-06-23T14:58:18.0528177Z   restore: true
-2026-06-23T14:58:18.0528351Z   max-size: 500MB
-2026-06-23T14:58:18.0528520Z   verbose: 0
-2026-06-23T14:58:18.0528671Z   save: true
-2026-06-23T14:58:18.0528849Z   append-timestamp: true
-2026-06-23T14:58:18.0529063Z   create-symlink: false
-2026-06-23T14:58:18.0529268Z   job-summary: CCache Statistics
-2026-06-23T14:58:18.0529505Z   update-package-index: false
-2026-06-23T14:58:18.0529721Z ##[endgroup]
-2026-06-23T14:58:18.1833353Z (node:8980) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-2026-06-23T14:58:18.1834176Z (Use `node --trace-deprecation ...` to show where the warning was created)
-2026-06-23T14:58:18.2815878Z ##[group]Install sccache
-2026-06-23T14:58:18.3635697Z [command]"C:\Program Files\Git\bin\sh.exe" -xc "curl -L 'https://github.com/mozilla/sccache/releases/download/v0.10.0/sccache-v0.10.0-x86_64-pc-windows-msvc.tar.gz' | tar xzf - -O --wildcards '*/sccache.exe' > 'C:\Users\runneradmin\.cargo\bin\sccache.exe'"
-2026-06-23T14:58:18.4141660Z + curl -L https://github.com/mozilla/sccache/releases/download/v0.10.0/sccache-v0.10.0-x86_64-pc-windows-msvc.tar.gz
-2026-06-23T14:58:18.4252232Z + tar xzf - -O --wildcards '*/sccache.exe'
-2026-06-23T14:58:18.4435350Z   % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
-2026-06-23T14:58:18.4438132Z                                  Dload  Upload  Total   Spent   Left   Speed
-2026-06-23T14:58:18.4438861Z 
-2026-06-23T14:58:18.5908934Z   0      0   0      0   0      0      0      0                              0
-2026-06-23T14:58:18.5911488Z   0      0   0      0   0      0      0      0                              0
-2026-06-23T14:58:18.5912090Z   0      0   0      0   0      0      0      0                              0
-2026-06-23T14:58:18.5917216Z 
-2026-06-23T14:58:19.1675940Z   0      0   0      0   0      0      0      0                              0
-2026-06-23T14:58:19.1676855Z 100  7.50M 100  7.50M   0      0 10.34M      0                              0
-2026-06-23T14:58:19.1677710Z 100  7.50M 100  7.50M   0      0 10.34M      0                              0
-2026-06-23T14:58:19.1679161Z 100  7.50M 100  7.50M   0      0 10.34M      0                              0
-2026-06-23T14:58:19.2917690Z [command]"C:\Program Files\Git\bin\sh.exe" -xc "chmod +x 'C:\Users\runneradmin\.cargo\bin\sccache.exe'"
-2026-06-23T14:58:19.3288684Z + chmod +x 'C:\Users\runneradmin\.cargo\bin\sccache.exe'
-2026-06-23T14:58:19.4166987Z C:\Users\runneradmin\.cargo\bin\sccache.exe
-2026-06-23T14:58:19.4933869Z ##[endgroup]
-2026-06-23T14:58:19.4934298Z ##[group]Restore cache
-2026-06-23T14:58:19.7956757Z Cache hit for restore-key: sccache-win-v1-2026-06-23T14:37:53.988Z
-2026-06-23T14:58:19.8071922Z (node:8980) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
-2026-06-23T14:58:20.9047926Z Received 134217728 of 543054004 (24.7%), 127.7 MBs/sec
-2026-06-23T14:58:21.9278672Z Received 356515840 of 543054004 (65.7%), 167.9 MBs/sec
-2026-06-23T14:58:22.9284405Z Received 536870912 of 543054004 (98.9%), 169.3 MBs/sec
-2026-06-23T14:58:22.9785031Z Received 543054004 of 543054004 (100.0%), 168.4 MBs/sec
-2026-06-23T14:58:22.9787901Z Cache Size: ~518 MB (543054004 B)
-2026-06-23T14:58:22.9850447Z [command]"C:\Program Files\Git\usr\bin\tar.exe" -xf D:/a/_temp/38d106af-d6d0-440e-8bdf-fc990064e126/cache.tzst -P -C D:/a/zvella/zvella --force-local --use-compress-program "zstd -d"
-2026-06-23T14:58:23.9879098Z Cache restored successfully
-2026-06-23T14:58:24.0149725Z Restored from cache key "sccache-win-v1-2026-06-23T14:37:53.988Z".
-2026-06-23T14:58:24.0151105Z ##[endgroup]
-2026-06-23T14:58:24.0151664Z ##[group]Configure sccache, win32
-2026-06-23T14:58:24.1175513Z [command]"C:\Program Files\Git\bin\sh.exe" -xc "env SCCACHE_IDLE_TIMEOUT=0 SCCACHE_DIR='D:\a\zvella\zvella\.sccache' SCCACHE_CACHE_SIZE='500MB' sccache --start-server"
-2026-06-23T14:58:24.1525107Z + env SCCACHE_IDLE_TIMEOUT=0 'SCCACHE_DIR=D:\a\zvella\zvella\.sccache' SCCACHE_CACHE_SIZE=500MB sccache --start-server
-2026-06-23T14:58:24.1857700Z sccache: Starting the server...
-2026-06-23T14:58:24.2127959Z sccache: Listening on address 127.0.0.1:4226
-2026-06-23T14:58:24.3220326Z [command]"C:\Program Files\Git\bin\sh.exe" -xc "sccache -z"
-2026-06-23T14:58:24.3577693Z + sccache -z
-2026-06-23T14:58:24.3749969Z Statistics zeroed.
-2026-06-23T14:58:24.3811327Z ##[endgroup]
-2026-06-23T14:58:24.6030311Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
-2026-06-23T14:58:24.6032619Z ##[group]Run actions/cache@v4
-2026-06-23T14:58:24.6032989Z with:
-2026-06-23T14:58:24.6033278Z   path: D:\a\zvella\zvella/cpm-cache
-2026-06-23T14:58:24.6033967Z   key: cpm-win-v1-227f179262f5b663f9a7a02af28448a4309a3b3d98695361f4ca2ce2203258c1
-2026-06-23T14:58:24.6034727Z   restore-keys: cpm-win-v1-
+﻿2026-06-23T15:13:14.8858237Z Current runner version: '2.335.1'
+2026-06-23T15:13:14.8892243Z ##[group]Runner Image Provisioner
+2026-06-23T15:13:14.8893909Z Hosted Compute Agent
+2026-06-23T15:13:14.8894770Z Version: 20260611.554
+2026-06-23T15:13:14.8895664Z Commit: 5e0782fdc9014723d3be820dd114dd31555c2bd1
+2026-06-23T15:13:14.8896791Z Build Date: 2026-06-11T21:40:46Z
+2026-06-23T15:13:14.8897850Z Worker ID: {6400dc75-fd9a-4eac-b9ed-b06314581b19}
+2026-06-23T15:13:14.8898904Z Azure Region: northcentralus
+2026-06-23T15:13:14.8899823Z ##[endgroup]
+2026-06-23T15:13:14.8901774Z ##[group]Operating System
+2026-06-23T15:13:14.8902716Z Microsoft Windows Server 2025
+2026-06-23T15:13:14.8903607Z 10.0.26100
+2026-06-23T15:13:14.8904324Z Datacenter
+2026-06-23T15:13:14.8905064Z ##[endgroup]
+2026-06-23T15:13:14.8905827Z ##[group]Runner Image
+2026-06-23T15:13:14.8906635Z Image: windows-2025-vs2026
+2026-06-23T15:13:14.8907631Z Version: 20260614.141.1
+2026-06-23T15:13:14.8910004Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20260614.141/images/windows/Windows2025-VS2026-Readme.md
+2026-06-23T15:13:14.8913178Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20260614.141
+2026-06-23T15:13:14.8914726Z ##[endgroup]
+2026-06-23T15:13:14.8916378Z ##[group]GITHUB_TOKEN Permissions
+2026-06-23T15:13:14.8919059Z Contents: write
+2026-06-23T15:13:14.8919919Z Metadata: read
+2026-06-23T15:13:14.8920978Z ##[endgroup]
+2026-06-23T15:13:14.8923939Z Secret source: Actions
+2026-06-23T15:13:14.8924989Z Prepare workflow directory
+2026-06-23T15:13:14.9389780Z Prepare all required actions
+2026-06-23T15:13:14.9444182Z Getting action download info
+2026-06-23T15:13:15.1709338Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+2026-06-23T15:13:15.3027661Z Download action repository 'geode-sdk/build-geode-mod@main' (SHA:825dce8c7404aacc975db01b09c99d295680cdec)
+2026-06-23T15:13:15.6276045Z Getting action download info
+2026-06-23T15:13:15.7581301Z Download action repository 'robinraju/release-downloader@v1.9' (SHA:368754b9c6f47c345fcfbf42bcb577c2f0f5f395)
+2026-06-23T15:13:15.9919594Z Download action repository 'hendrikmuhs/ccache-action@v1' (SHA:5ebbd400eff9e74630f759d94ddd7b6c26299639)
+2026-06-23T15:13:16.2485320Z Download action repository 'actions/cache@v4' (SHA:0057852bfaa89a56745cba8c7296529d2fc39830)
+2026-06-23T15:13:16.3782806Z Download action repository 'geode-sdk/cli@main' (SHA:0a69a366e22240939dbea2dc25d9b90b22b02e52)
+2026-06-23T15:13:16.5832081Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-06-23T15:13:16.9042013Z Getting action download info
+2026-06-23T15:13:16.9869136Z Download action repository 'robinraju/release-downloader@v1.10' (SHA:c39a3b234af58f0cf85888573d361fb6fa281534)
+2026-06-23T15:13:17.3115396Z Complete job name: Windows
+2026-06-23T15:13:17.4370397Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-06-23T15:13:17.4379157Z ##[group]Run actions/checkout@v4
+2026-06-23T15:13:17.4379609Z with:
+2026-06-23T15:13:17.4379853Z   submodules: recursive
+2026-06-23T15:13:17.4380135Z   repository: gigasteeven/zvella
+2026-06-23T15:13:17.4383043Z   token: ***
+2026-06-23T15:13:17.4383290Z   ssh-strict: true
+2026-06-23T15:13:17.4383540Z   ssh-user: git
+2026-06-23T15:13:17.4383793Z   persist-credentials: true
+2026-06-23T15:13:17.4384063Z   clean: true
+2026-06-23T15:13:17.4384313Z   sparse-checkout-cone-mode: true
+2026-06-23T15:13:17.4384599Z   fetch-depth: 1
+2026-06-23T15:13:17.4384826Z   fetch-tags: false
+2026-06-23T15:13:17.4385069Z   show-progress: true
+2026-06-23T15:13:17.4385361Z   lfs: false
+2026-06-23T15:13:17.4385591Z   set-safe-directory: true
+2026-06-23T15:13:17.4385999Z ##[endgroup]
+2026-06-23T15:13:17.5938373Z Syncing repository: gigasteeven/zvella
+2026-06-23T15:13:17.5940238Z ##[group]Getting Git version info
+2026-06-23T15:13:17.5940771Z Working directory is 'D:\a\zvella\zvella'
+2026-06-23T15:13:17.6700515Z [command]"C:\Program Files\Git\bin\git.exe" version
+2026-06-23T15:13:17.8222945Z git version 2.54.0.windows.1
+2026-06-23T15:13:17.8272213Z ##[endgroup]
+2026-06-23T15:13:17.8293217Z Temporarily overriding HOME='D:\a\_temp\bf938364-94ac-49d3-be05-ff9c49259c24' before making global git config changes
+2026-06-23T15:13:17.8294615Z Adding repository directory to the temporary git global config as a safe directory
+2026-06-23T15:13:17.8305039Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\zvella\zvella
+2026-06-23T15:13:17.8622594Z Deleting the contents of 'D:\a\zvella\zvella'
+2026-06-23T15:13:17.8629052Z ##[group]Initializing the repository
+2026-06-23T15:13:17.8640434Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\zvella\zvella
+2026-06-23T15:13:17.9235420Z Initialized empty Git repository in D:/a/zvella/zvella/.git/
+2026-06-23T15:13:17.9288193Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/gigasteeven/zvella
+2026-06-23T15:13:17.9672791Z ##[endgroup]
+2026-06-23T15:13:17.9673548Z ##[group]Disabling automatic garbage collection
+2026-06-23T15:13:17.9683301Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+2026-06-23T15:13:18.0070688Z ##[endgroup]
+2026-06-23T15:13:18.0071387Z ##[group]Setting up auth
+2026-06-23T15:13:18.0084681Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2026-06-23T15:13:18.0406065Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2026-06-23T15:13:18.9505123Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-06-23T15:13:18.9837951Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2026-06-23T15:13:19.6049924Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-06-23T15:13:19.6389152Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-06-23T15:13:20.1957895Z [command]"C:\Program Files\Git\bin\git.exe" config --local http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+2026-06-23T15:13:20.2276222Z ##[endgroup]
+2026-06-23T15:13:20.2280536Z ##[group]Fetching the repository
+2026-06-23T15:13:20.2294356Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +79cf57f244cdbb1e84dfffd9054c20cf0805309b:refs/remotes/origin/main
+2026-06-23T15:13:20.8396243Z From https://github.com/gigasteeven/zvella
+2026-06-23T15:13:20.8397623Z  * [new ref]         79cf57f244cdbb1e84dfffd9054c20cf0805309b -> origin/main
+2026-06-23T15:13:20.8747395Z ##[endgroup]
+2026-06-23T15:13:20.8748025Z ##[group]Determining the checkout info
+2026-06-23T15:13:20.8750545Z ##[endgroup]
+2026-06-23T15:13:20.8767785Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+2026-06-23T15:13:20.9171402Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+2026-06-23T15:13:20.9490720Z ##[group]Checking out the ref
+2026-06-23T15:13:20.9505986Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B main refs/remotes/origin/main
+2026-06-23T15:13:20.9962461Z Switched to a new branch 'main'
+2026-06-23T15:13:20.9983155Z branch 'main' set up to track 'origin/main'.
+2026-06-23T15:13:21.0034836Z ##[endgroup]
+2026-06-23T15:13:21.0036968Z ##[group]Setting up auth for fetching submodules
+2026-06-23T15:13:21.0047037Z [command]"C:\Program Files\Git\bin\git.exe" config --global http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+2026-06-23T15:13:21.0370278Z [command]"C:\Program Files\Git\bin\git.exe" config --global --unset-all url.https://github.com/.insteadOf
+2026-06-23T15:13:21.0699942Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add url.https://github.com/.insteadOf git@github.com:
+2026-06-23T15:13:21.1042773Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add url.https://github.com/.insteadOf org-286074774@github.com:
+2026-06-23T15:13:21.1462444Z ##[endgroup]
+2026-06-23T15:13:21.1463200Z ##[group]Fetching submodules
+2026-06-23T15:13:21.1472431Z [command]"C:\Program Files\Git\bin\git.exe" submodule sync --recursive
+2026-06-23T15:13:21.7322375Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 submodule update --init --force --depth=1 --recursive
+2026-06-23T15:13:22.2753713Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local gc.auto 0"
+2026-06-23T15:13:22.8420585Z ##[endgroup]
+2026-06-23T15:13:22.8421259Z ##[group]Persisting credentials for submodules
+2026-06-23T15:13:22.8437295Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'url\.https\:\/\/github\.com\/\.insteadOf' && git config --local --unset-all 'url.https://github.com/.insteadOf' || :\""
+2026-06-23T15:13:23.3979201Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local 'http.https://github.com/.extraheader' 'AUTHORIZATION: basic ***' && git config --local --show-origin --name-only --get-regexp remote.origin.url\""
+2026-06-23T15:13:23.9297099Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --add 'url.https://github.com/.insteadOf' 'git@github.com:'"
+2026-06-23T15:13:24.4780515Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --add 'url.https://github.com/.insteadOf' 'org-286074774@github.com:'"
+2026-06-23T15:13:25.0159876Z ##[endgroup]
+2026-06-23T15:13:25.0498598Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+2026-06-23T15:13:25.0757178Z 79cf57f244cdbb1e84dfffd9054c20cf0805309b
+2026-06-23T15:13:25.1412677Z ##[group]Run geode-sdk/build-geode-mod@main
+2026-06-23T15:13:25.1413042Z with:
+2026-06-23T15:13:25.1413224Z   sdk: v5.7.1
+2026-06-23T15:13:25.1413405Z   combine: true
+2026-06-23T15:13:25.1413593Z   cli: latest
+2026-06-23T15:13:25.1413775Z   build-config: Release
+2026-06-23T15:13:25.1413983Z   path: ./
+2026-06-23T15:13:25.1414165Z   bindings: geode-sdk/bindings
+2026-06-23T15:13:25.1414405Z   android-min-sdk: 23
+2026-06-23T15:13:25.1414613Z   ccache-variant: default
+2026-06-23T15:13:25.1414823Z   use-cpm-cache: true
+2026-06-23T15:13:25.1415017Z   export-pdb: false
+2026-06-23T15:13:25.1415202Z   export-debug: false
+2026-06-23T15:13:25.1415407Z   use-lto: true
+2026-06-23T15:13:25.1415580Z   bundle-pdb: false
+2026-06-23T15:13:25.1415761Z   export-symbols: false
+2026-06-23T15:13:25.1415957Z ##[endgroup]
+2026-06-23T15:13:25.1637718Z ##[group]Run DEFAULT_TARGET=Win64
+2026-06-23T15:13:25.1638053Z [36;1mDEFAULT_TARGET=Win64[0m
+2026-06-23T15:13:25.1638340Z [36;1mDEFAULT_CCACHE=sccache[0m
+2026-06-23T15:13:25.1638615Z [36;1mif [ "$RUNNER_OS" = "Linux" ]; then[0m
+2026-06-23T15:13:25.1638884Z [36;1m  ID=linux[0m
+2026-06-23T15:13:25.1639095Z [36;1m  DEFAULT_TARGET=Android64[0m
+2026-06-23T15:13:25.1639364Z [36;1melif [ "$RUNNER_OS" = "Windows" ]; then[0m
+2026-06-23T15:13:25.1639627Z [36;1m  ID=win[0m
+2026-06-23T15:13:25.1639828Z [36;1m  DEFAULT_TARGET=Win64[0m
+2026-06-23T15:13:25.1640084Z [36;1melif [ "$RUNNER_OS" = "macOS" ]; then[0m
+2026-06-23T15:13:25.1640332Z [36;1m  ID=mac[0m
+2026-06-23T15:13:25.1640506Z [36;1m  DEFAULT_TARGET=MacOS[0m
+2026-06-23T15:13:25.1640720Z [36;1m  DEFAULT_CCACHE=[0m
+2026-06-23T15:13:25.1641224Z [36;1mfi[0m
+2026-06-23T15:13:25.1641420Z [36;1m[0m
+2026-06-23T15:13:25.1641604Z [36;1mCCACHE_VARIANT=default[0m
+2026-06-23T15:13:25.1641860Z [36;1mif [ "$CCACHE_VARIANT" = "default" ]; then[0m
+2026-06-23T15:13:25.1642137Z [36;1m  CCACHE_VARIANT=$DEFAULT_CCACHE[0m
+2026-06-23T15:13:25.1642369Z [36;1mfi[0m
+2026-06-23T15:13:25.1642531Z [36;1m[0m
+2026-06-23T15:13:25.1642687Z [36;1mTARGET=[0m
+2026-06-23T15:13:25.1642880Z [36;1mif [ "$TARGET" = "" ]; then[0m
+2026-06-23T15:13:25.1643117Z [36;1m  TARGET=$DEFAULT_TARGET[0m
+2026-06-23T15:13:25.1643332Z [36;1mfi[0m
+2026-06-23T15:13:25.1643488Z [36;1m[0m
+2026-06-23T15:13:25.1643669Z [36;1mif [ "$TARGET" = "Android32" ]; then[0m
+2026-06-23T15:13:25.1643935Z [36;1m  OUTPUT_ID=android32[0m
+2026-06-23T15:13:25.1644183Z [36;1melif [ "$TARGET" = "Android64" ]; then[0m
+2026-06-23T15:13:25.1644453Z [36;1m  OUTPUT_ID=android64[0m
+2026-06-23T15:13:25.1644675Z [36;1melif [ "$TARGET" = "Win64" ]; then[0m
+2026-06-23T15:13:25.1644935Z [36;1m  OUTPUT_ID=win[0m
+2026-06-23T15:13:25.1645145Z [36;1melif [ "$TARGET" = "MacOS" ]; then[0m
+2026-06-23T15:13:25.1645377Z [36;1m  OUTPUT_ID=mac[0m
+2026-06-23T15:13:25.1645583Z [36;1melif [ "$TARGET" = "iOS" ]; then[0m
+2026-06-23T15:13:25.1645815Z [36;1m  OUTPUT_ID=ios[0m
+2026-06-23T15:13:25.1645997Z [36;1mfi[0m
+2026-06-23T15:13:25.1646155Z [36;1m[0m
+2026-06-23T15:13:25.1646344Z [36;1mecho "id=$ID" >> $GITHUB_OUTPUT[0m
+2026-06-23T15:13:25.1646618Z [36;1mecho "target=$TARGET" >> $GITHUB_OUTPUT[0m
+2026-06-23T15:13:25.1646931Z [36;1mecho "target_id=$OUTPUT_ID" >> $GITHUB_OUTPUT[0m
+2026-06-23T15:13:25.1647278Z [36;1mecho "ccache_variant=$CCACHE_VARIANT" >> $GITHUB_OUTPUT[0m
+2026-06-23T15:13:25.1661663Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+2026-06-23T15:13:25.1662067Z ##[endgroup]
+2026-06-23T15:13:25.2302870Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-06-23T15:13:25.2304499Z ##[group]Run hendrikmuhs/ccache-action@v1
+2026-06-23T15:13:25.2304753Z with:
+2026-06-23T15:13:25.2307225Z   variant: sccache
+2026-06-23T15:13:25.2307487Z   key: win-v1
+2026-06-23T15:13:25.2307666Z   restore: true
+2026-06-23T15:13:25.2307849Z   max-size: 500MB
+2026-06-23T15:13:25.2308024Z   verbose: 0
+2026-06-23T15:13:25.2308188Z   save: true
+2026-06-23T15:13:25.2308367Z   append-timestamp: true
+2026-06-23T15:13:25.2308590Z   create-symlink: false
+2026-06-23T15:13:25.2308799Z   job-summary: CCache Statistics
+2026-06-23T15:13:25.2309032Z   update-package-index: false
+2026-06-23T15:13:25.2309249Z ##[endgroup]
+2026-06-23T15:13:25.4165592Z (node:6692) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-06-23T15:13:25.4166704Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-06-23T15:13:25.5024766Z ##[group]Install sccache
+2026-06-23T15:13:25.5855298Z [command]"C:\Program Files\Git\bin\sh.exe" -xc "curl -L 'https://github.com/mozilla/sccache/releases/download/v0.10.0/sccache-v0.10.0-x86_64-pc-windows-msvc.tar.gz' | tar xzf - -O --wildcards '*/sccache.exe' > 'C:\Users\runneradmin\.cargo\bin\sccache.exe'"
+2026-06-23T15:13:25.6381926Z + curl -L https://github.com/mozilla/sccache/releases/download/v0.10.0/sccache-v0.10.0-x86_64-pc-windows-msvc.tar.gz
+2026-06-23T15:13:25.6514851Z + tar xzf - -O --wildcards '*/sccache.exe'
+2026-06-23T15:13:25.6620928Z   % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+2026-06-23T15:13:25.6622415Z                                  Dload  Upload  Total   Spent   Left   Speed
+2026-06-23T15:13:25.6627802Z 
+2026-06-23T15:13:25.8350655Z   0      0   0      0   0      0      0      0                              0
+2026-06-23T15:13:25.8351994Z   0      0   0      0   0      0      0      0                              0
+2026-06-23T15:13:25.8352594Z   0      0   0      0   0      0      0      0                              0
+2026-06-23T15:13:25.8357915Z 
+2026-06-23T15:13:26.2521636Z   0      0   0      0   0      0      0      0                              0
+2026-06-23T15:13:26.2537531Z 100  7.50M 100  7.50M   0      0 12.67M      0                              0
+2026-06-23T15:13:26.2547836Z 100  7.50M 100  7.50M   0      0 12.66M      0                              0
+2026-06-23T15:13:26.2557645Z 100  7.50M 100  7.50M   0      0 12.66M      0                              0
+2026-06-23T15:13:26.3875117Z [command]"C:\Program Files\Git\bin\sh.exe" -xc "chmod +x 'C:\Users\runneradmin\.cargo\bin\sccache.exe'"
+2026-06-23T15:13:26.4239326Z + chmod +x 'C:\Users\runneradmin\.cargo\bin\sccache.exe'
+2026-06-23T15:13:26.5153345Z C:\Users\runneradmin\.cargo\bin\sccache.exe
+2026-06-23T15:13:26.5929257Z ##[endgroup]
+2026-06-23T15:13:26.5930016Z ##[group]Restore cache
+2026-06-23T15:13:26.8624727Z Cache hit for restore-key: sccache-win-v1-2026-06-23T15:01:24.836Z
+2026-06-23T15:13:26.8746315Z (node:6692) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-06-23T15:13:27.9744224Z Received 134217728 of 584346398 (23.0%), 127.7 MBs/sec
+2026-06-23T15:13:28.9794003Z Received 322961408 of 584346398 (55.3%), 153.5 MBs/sec
+2026-06-23T15:13:30.1154404Z Received 536870912 of 584346398 (91.9%), 163.2 MBs/sec
+2026-06-23T15:13:30.3946311Z Received 584346398 of 584346398 (100.0%), 163.3 MBs/sec
+2026-06-23T15:13:30.3948420Z Cache Size: ~557 MB (584346398 B)
+2026-06-23T15:13:30.3951186Z [command]"C:\Program Files\Git\usr\bin\tar.exe" -xf D:/a/_temp/38731e4f-edc2-41dc-9c71-6aba8b2e82de/cache.tzst -P -C D:/a/zvella/zvella --force-local --use-compress-program "zstd -d"
+2026-06-23T15:13:31.5338815Z Cache restored successfully
+2026-06-23T15:13:31.6023634Z Restored from cache key "sccache-win-v1-2026-06-23T15:01:24.836Z".
+2026-06-23T15:13:31.6024847Z ##[endgroup]
+2026-06-23T15:13:31.6025535Z ##[group]Configure sccache, win32
+2026-06-23T15:13:31.6757046Z [command]"C:\Program Files\Git\bin\sh.exe" -xc "env SCCACHE_IDLE_TIMEOUT=0 SCCACHE_DIR='D:\a\zvella\zvella\.sccache' SCCACHE_CACHE_SIZE='500MB' sccache --start-server"
+2026-06-23T15:13:31.7174965Z + env SCCACHE_IDLE_TIMEOUT=0 'SCCACHE_DIR=D:\a\zvella\zvella\.sccache' SCCACHE_CACHE_SIZE=500MB sccache --start-server
+2026-06-23T15:13:31.7543918Z sccache: Starting the server...
+2026-06-23T15:13:31.7841119Z sccache: Listening on address 127.0.0.1:4226
+2026-06-23T15:13:31.8674282Z [command]"C:\Program Files\Git\bin\sh.exe" -xc "sccache -z"
+2026-06-23T15:13:31.9111781Z + sccache -z
+2026-06-23T15:13:31.9328614Z Statistics zeroed.
+2026-06-23T15:13:31.9405624Z ##[endgroup]
+2026-06-23T15:13:32.1743153Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-06-23T15:13:32.1744405Z ##[group]Run actions/cache@v4
+2026-06-23T15:13:32.1744641Z with:
+2026-06-23T15:13:32.1744833Z   path: D:\a\zvella\zvella/cpm-cache
+2026-06-23T15:13:32.1745241Z   key: cpm-win-v1-227f179262f5b663f9a7a02af28448a4309a3b3d98695361f4ca2ce2203258c1
+2026-06-23T15:13:32.1745802Z   restore-keys: cpm-win-v1-
 
-2026-06-23T14:58:24.6035141Z   enableCrossOsArchive: false
-2026-06-23T14:58:24.6035529Z   fail-on-cache-miss: false
-2026-06-23T14:58:24.6035886Z   lookup-only: false
-2026-06-23T14:58:24.6036198Z   save-always: false
-2026-06-23T14:58:24.6036503Z ##[endgroup]
-2026-06-23T14:58:24.7565002Z (node:5388) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-2026-06-23T14:58:24.7567704Z (Use `node --trace-deprecation ...` to show where the warning was created)
-2026-06-23T14:58:25.0374881Z Cache hit for: cpm-win-v1-227f179262f5b663f9a7a02af28448a4309a3b3d98695361f4ca2ce2203258c1
-2026-06-23T14:58:25.0505714Z (node:5388) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
-2026-06-23T14:58:25.3941958Z Received 5659198 of 5659198 (100.0%), 20.6 MBs/sec
-2026-06-23T14:58:25.3943423Z Cache Size: ~5 MB (5659198 B)
-2026-06-23T14:58:25.3968507Z [command]"C:\Program Files\Git\usr\bin\tar.exe" -xf D:/a/_temp/d0540459-968a-4c8c-9b2b-7803ccc74402/cache.tzst -P -C D:/a/zvella/zvella --force-local --use-compress-program "zstd -d"
-2026-06-23T14:58:25.7210584Z Cache restored successfully
-2026-06-23T14:58:25.7330461Z Cache restored from key: cpm-win-v1-227f179262f5b663f9a7a02af28448a4309a3b3d98695361f4ca2ce2203258c1
-2026-06-23T14:58:25.7613193Z ##[group]Run curl -L https://github.com/ninja-build/ninja/releases/latest/download/ninja-win.zip -o ninja.zip
-2026-06-23T14:58:25.7615892Z [36;1mcurl -L https://github.com/ninja-build/ninja/releases/latest/download/ninja-win.zip -o ninja.zip[0m
-2026-06-23T14:58:25.7617005Z [36;1m7z x ninja.zip -o"$GITHUB_WORKSPACE/ninja"[0m
-2026-06-23T14:58:25.7617647Z [36;1mecho "$GITHUB_WORKSPACE/ninja" >> $GITHUB_PATH[0m
-2026-06-23T14:58:25.7639800Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
-2026-06-23T14:58:25.7640514Z ##[endgroup]
-2026-06-23T14:58:25.8324914Z   % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
-2026-06-23T14:58:25.8326300Z                                  Dload  Upload  Total   Spent   Left   Speed
-2026-06-23T14:58:25.8326766Z 
-2026-06-23T14:58:25.9818726Z   0      0   0      0   0      0      0      0                              0
-2026-06-23T14:58:25.9819958Z   0      0   0      0   0      0      0      0                              0
-2026-06-23T14:58:25.9821693Z   0      0   0      0   0      0      0      0                              0
-2026-06-23T14:58:25.9822196Z 
-2026-06-23T14:58:26.0816828Z   0      0   0      0   0      0      0      0                              0
-2026-06-23T14:58:26.0818261Z   0      0   0      0   0      0      0      0                              0
-2026-06-23T14:58:26.0819017Z   0      0   0      0   0      0      0      0                              0
-2026-06-23T14:58:26.0825548Z 
-2026-06-23T14:58:26.0977431Z   0      0   0      0   0      0      0      0                              0
-2026-06-23T14:58:26.0978162Z 100 284.7k 100 284.7k   0      0  1.04M      0                              0
-2026-06-23T14:58:26.0980088Z 100 284.7k 100 284.7k   0      0  1.04M      0                              0
-2026-06-23T14:58:26.0981356Z 100 284.7k 100 284.7k   0      0  1.04M      0                              0
-2026-06-23T14:58:27.2145420Z 
-2026-06-23T14:58:27.2146394Z 7-Zip 26.01 (x64) : Copyright (c) 1999-2026 Igor Pavlov : 2026-04-27
-2026-06-23T14:58:27.2146890Z 
-2026-06-23T14:58:27.2147027Z Scanning the drive for archives:
-2026-06-23T14:58:27.2147368Z 1 file, 291570 bytes (285 KiB)
-2026-06-23T14:58:27.2147581Z 
-2026-06-23T14:58:27.2147706Z Extracting archive: ninja.zip
-2026-06-23T14:58:27.3626967Z --
-2026-06-23T14:58:27.3627443Z Path = ninja.zip
-2026-06-23T14:58:27.3627858Z Type = zip
-2026-06-23T14:58:27.3628207Z Physical Size = 291570
-2026-06-23T14:58:27.3628493Z 
-2026-06-23T14:58:27.3791438Z Everything is Ok
-2026-06-23T14:58:27.3791761Z 
-2026-06-23T14:58:27.3791918Z Size:       603648
-2026-06-23T14:58:27.3792241Z Compressed: 291570
-2026-06-23T14:58:27.4054929Z ##[group]Run geode-sdk/cli/.github/actions/setup@main
-2026-06-23T14:58:27.4055231Z with:
-2026-06-23T14:58:27.4055400Z   version: latest
-2026-06-23T14:58:27.4055576Z ##[endgroup]
-2026-06-23T14:58:27.4161704Z ##[group]Run if [ "$RUNNER_OS" = "Linux" ]; then
-2026-06-23T14:58:27.4162179Z [36;1mif [ "$RUNNER_OS" = "Linux" ]; then[0m
-2026-06-23T14:58:27.4162470Z [36;1m  echo "host=linux" >> $GITHUB_OUTPUT[0m
-2026-06-23T14:58:27.4162770Z [36;1melif [ "$RUNNER_OS" = "Windows" ]; then[0m
-2026-06-23T14:58:27.4163057Z [36;1m  echo "host=win" >> $GITHUB_OUTPUT[0m
-2026-06-23T14:58:27.4163352Z [36;1melif [ "$RUNNER_OS" = "macOS" ]; then[0m
-2026-06-23T14:58:27.4163638Z [36;1m  echo "host=mac" >> $GITHUB_OUTPUT[0m
-2026-06-23T14:58:27.4163879Z [36;1mfi[0m
-2026-06-23T14:58:27.4175505Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
-2026-06-23T14:58:27.4175901Z ##[endgroup]
-2026-06-23T14:58:27.4693997Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
-2026-06-23T14:58:27.4695967Z ##[group]Run robinraju/release-downloader@v1.10
-2026-06-23T14:58:27.4696271Z with:
-2026-06-23T14:58:27.4696447Z   repository: geode-sdk/cli
-2026-06-23T14:58:27.4696656Z   latest: true
-2026-06-23T14:58:27.4696833Z   fileName: *-win.zip
-2026-06-23T14:58:27.4697023Z   tarBall: false
-2026-06-23T14:58:27.4697197Z   zipBall: false
-2026-06-23T14:58:27.4697413Z   out-file-path: my-epic-geode-cli
-2026-06-23T14:58:27.4697657Z   preRelease: false
-2026-06-23T14:58:27.4697835Z   extract: false
-2026-06-23T14:58:27.4700717Z   token: ***
-2026-06-23T14:58:27.4700924Z   github-api-url: https://api.github.com
-2026-06-23T14:58:27.4701195Z ##[endgroup]
-2026-06-23T14:58:27.5680268Z Fetching latest release for repo geode-sdk/cli
-2026-06-23T14:58:27.5848668Z (node:6296) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
-2026-06-23T14:58:27.5849755Z (Use `node --trace-deprecation ...` to show where the warning was created)
-2026-06-23T14:58:27.8281912Z Found latest release version: v3.7.4
-2026-06-23T14:58:27.8290055Z Downloading file: geode-cli-v3.7.4-win.zip to: D:\a\zvella\zvella\my-epic-geode-cli
-2026-06-23T14:58:28.1189598Z Done: D:\a\zvella\zvella\my-epic-geode-cli\geode-cli-v3.7.4-win.zip
-2026-06-23T14:58:28.1421775Z ##[group]Run 7z x "my-epic-geode-cli/*-win.zip" -omy-epic-geode-cli
-2026-06-23T14:58:28.1422240Z [36;1m7z x "my-epic-geode-cli/*-win.zip" -omy-epic-geode-cli[0m
-2026-06-23T14:58:28.1422580Z [36;1mchmod +x my-epic-geode-cli/geode[0m
-2026-06-23T14:58:28.1422929Z [36;1mecho "$GITHUB_WORKSPACE/my-epic-geode-cli" >> $GITHUB_PATH[0m
-2026-06-23T14:58:28.1434689Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
-2026-06-23T14:58:28.1435393Z ##[endgroup]
-2026-06-23T14:58:28.2289649Z 
-2026-06-23T14:58:28.2290128Z 7-Zip 26.01 (x64) : Copyright (c) 1999-2026 Igor Pavlov : 2026-04-27
-2026-06-23T14:58:28.2290547Z 
-2026-06-23T14:58:28.2290646Z Scanning the drive for archives:
-2026-06-23T14:58:28.2290895Z 1 file, 11925441 bytes (12 MiB)
-2026-06-23T14:58:28.2291049Z 
-2026-06-23T14:58:28.2291228Z Extracting archive: my-epic-geode-cli\geode-cli-v3.7.4-win.zip
-2026-06-23T14:58:28.4181947Z --
-2026-06-23T14:58:28.4182397Z Path = my-epic-geode-cli\geode-cli-v3.7.4-win.zip
-2026-06-23T14:58:28.4182916Z Type = zip
-2026-06-23T14:58:28.4183213Z Physical Size = 11925441
-2026-06-23T14:58:28.4183441Z 
-2026-06-23T14:58:28.4186109Z Everything is Ok
-2026-06-23T14:58:28.4186380Z 
-2026-06-23T14:58:28.4186522Z Size:       32337756
-2026-06-23T14:58:28.4186859Z Compressed: 11925441
-2026-06-23T14:58:28.4582366Z ##[group]Run export CLI_PROFILE="D:\a\zvella\zvella/cli-profile"
-2026-06-23T14:58:28.4582811Z [36;1mexport CLI_PROFILE="D:\a\zvella\zvella/cli-profile"[0m
-2026-06-23T14:58:28.4597216Z [36;1m# for windows[0m
-2026-06-23T14:58:28.4597537Z [36;1mmkdir -p "$CLI_PROFILE/geode/mods"[0m
-2026-06-23T14:58:28.4598357Z [36;1m# for mac[0m
-2026-06-23T14:58:28.4598774Z [36;1mmkdir -p "$CLI_PROFILE/Contents/geode/mods"[0m
-2026-06-23T14:58:28.4599543Z [36;1mgeode profile add --name GithubActions "$CLI_PROFILE/GeometryDash.exe" win[0m
-2026-06-23T14:58:28.4600262Z [36;1m[0m
-2026-06-23T14:58:28.4600714Z [36;1mgeode sdk install "D:\a\zvella\zvella/geode-sdk-clone"[0m
-2026-06-23T14:58:28.4601266Z [36;1m[0m
-2026-06-23T14:58:28.4601618Z [36;1m# silly github actions wont refresh the env[0m
-2026-06-23T14:58:28.4602265Z [36;1mexport GEODE_SDK="D:\a\zvella\zvella/geode-sdk-clone"[0m
-2026-06-23T14:58:28.4602900Z [36;1mecho "GEODE_SDK=$GEODE_SDK" >> $GITHUB_ENV[0m
-2026-06-23T14:58:28.4603377Z [36;1m[0m
-2026-06-23T14:58:28.4603693Z [36;1mif [ "v5.7.1" == "nightly" ]; then[0m
-2026-06-23T14:58:28.4604164Z [36;1m  geode sdk update nightly[0m
-2026-06-23T14:58:28.4604939Z [36;1m  geode sdk install-binaries --platform win[0m
-2026-06-23T14:58:28.4605474Z [36;1melif [ "v5.7.1" == "latest" ]; then[0m
-2026-06-23T14:58:28.4605957Z [36;1m  geode sdk update stable[0m
-2026-06-23T14:58:28.4606458Z [36;1m  geode sdk install-binaries --platform win[0m
-2026-06-23T14:58:28.4607015Z [36;1melif [ "v5.7.1" == "given" ]; then[0m
-2026-06-23T14:58:28.4607869Z [36;1m  export MOD_JSON_PATH=$(find . -name "mod.json" -not -path "./geode-sdk-clone/*" -print | sort -r | head -n 1)[0m
-2026-06-23T14:58:28.4608920Z [36;1m  export TARGET_GEODE_VERSION=$(jq -r '.geode' $MOD_JSON_PATH)[0m
-2026-06-23T14:58:28.4609755Z [36;1m  echo "Updating to version $TARGET_GEODE_VERSION from $MOD_JSON_PATH"[0m
-2026-06-23T14:58:28.4610487Z [36;1m  geode sdk update "$TARGET_GEODE_VERSION"[0m
-2026-06-23T14:58:28.4611126Z [36;1m  geode sdk install-binaries --platform win --version "$TARGET_GEODE_VERSION"[0m
-2026-06-23T14:58:28.4615326Z [36;1melse[0m
-2026-06-23T14:58:28.4615750Z [36;1m  geode sdk update v5.7.1[0m
-2026-06-23T14:58:28.4616292Z [36;1m  geode sdk install-binaries --platform win[0m
-2026-06-23T14:58:28.4616810Z [36;1mfi[0m
-2026-06-23T14:58:28.4617099Z [36;1m[0m
-2026-06-23T14:58:28.4617496Z [36;1mexport CPM_CACHE="D:\a\zvella\zvella/cpm-cache"[0m
-2026-06-23T14:58:28.4618162Z [36;1mecho "CPM_SOURCE_CACHE=$CPM_CACHE" >> $GITHUB_ENV[0m
-2026-06-23T14:58:28.4632550Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
-2026-06-23T14:58:28.4633574Z ##[endgroup]
-2026-06-23T14:58:28.5745818Z | Done | A new profile named 'GithubActions' has been created
-2026-06-23T14:58:28.6010905Z | Info | Downloading SDK
-2026-06-23T14:58:28.8687522Z | Info | Enumerating objects: 59063, done.
-2026-06-23T14:58:28.8688038Z | Info | Counting objects:   0% (1/875)
-2026-06-23T14:58:28.8688520Z | Info | Counting objects:   1% (9/875)
-2026-06-23T14:58:28.8688959Z | Info | Counting objects:   2% (18/875)
-2026-06-23T14:58:28.8689433Z | Info | Counting objects:   3% (27/875)
-2026-06-23T14:58:28.8689929Z | Info | Counting objects:   4% (35/875)
-2026-06-23T14:58:28.8690433Z | Info | Counting objects:   5% (44/875)
-2026-06-23T14:58:28.8690948Z | Info | Counting objects:   6% (53/875)
-2026-06-23T14:58:28.8691409Z | Info | Counting objects:   7% (62/875)
-2026-06-23T14:58:28.8691871Z | Info | Counting objects:   8% (70/875)
-2026-06-23T14:58:28.8692327Z | Info | Counting objects:   9% (79/875)
-2026-06-23T14:58:28.8693208Z | Info | Counting objects:  10% (88/875)
-2026-06-23T14:58:28.8694099Z | Info | Counting objects:  11% (97/875)
-2026-06-23T14:58:28.8694633Z | Info | Counting objects:  12% (105/875)
-2026-06-23T14:58:28.8695099Z | Info | Counting objects:  13% (114/875)
-2026-06-23T14:58:28.8695564Z | Info | Counting objects:  14% (123/875)
-2026-06-23T14:58:28.8696029Z | Info | Counting objects:  15% (132/875)
-2026-06-23T14:58:28.8696483Z | Info | Counting objects:  16% (140/875)
-2026-06-23T14:58:28.8696936Z | Info | Counting objects:  17% (149/875)
-2026-06-23T14:58:28.8697408Z | Info | Counting objects:  18% (158/875)
-2026-06-23T14:58:28.8697884Z | Info | Counting objects:  19% (167/875)
-2026-06-23T14:58:28.8698568Z | Info | Counting objects:  20% (175/875)
-2026-06-23T14:58:28.8699043Z | Info | Counting objects:  21% (184/875)
-2026-06-23T14:58:28.8699515Z | Info | Counting objects:  22% (193/875)
-2026-06-23T14:58:28.8699980Z Counting objects:  23% (202/875)
-2026-06-23T14:58:28.8700409Z | Info | Counting objects:  24% (210/875)
-2026-06-23T14:58:28.8700877Z | Info | Counting objects:  25% (219/875)
-2026-06-23T14:58:28.8701327Z | Info | Counting objects:  26% (228/875)
-2026-06-23T14:58:28.8701776Z | Info | Counting objects:  27% (237/875)
-2026-06-23T14:58:28.8702235Z | Info | Counting objects:  28% (245/875)
-2026-06-23T14:58:28.8702679Z | Info | Counting objects:  29% (254/875)
-2026-06-23T14:58:28.8703124Z | Info | Counting objects:  30% (263/875)
-2026-06-23T14:58:28.8703565Z Counting objects:  31% (272/875)
-2026-06-23T14:58:28.8703983Z | Info | Counting objects:  32% (280/875)
-2026-06-23T14:58:28.8704428Z | Info | Counting objects:  33% (289/875)
-2026-06-23T14:58:28.8704880Z | Info | Counting objects:  34% (298/875)
-2026-06-23T14:58:28.8705322Z Counting objects:  35% (307/875)
-2026-06-23T14:58:28.8705745Z | Info | Counting objects:  36% (315/875)
-2026-06-23T14:58:28.8706194Z | Info | Counting objects:  37% (324/875)
-2026-06-23T14:58:28.8706637Z | Info | Counting objects:  38% (333/875)
-2026-06-23T14:58:28.8707087Z | Info | Counting objects:  39% (342/875)
-2026-06-23T14:58:28.8707873Z Counting objects:  40% (350/875)
-2026-06-23T14:58:28.8708279Z | Info | Counting objects:  41% (359/875)
-2026-06-23T14:58:28.8708732Z | Info | Counting objects:  42% (368/875)
-2026-06-23T14:58:28.8709185Z | Info | Counting objects:  43% (377/875)
-2026-06-23T14:58:28.8709644Z | Info | Counting objects:  44% (385/875)
-2026-06-23T14:58:28.8710122Z | Info | Counting objects:  45% (394/875)
-2026-06-23T14:58:28.8710581Z | Info | Counting objects:  46% (403/875)
-2026-06-23T14:58:28.8711023Z Counting objects:  47% (412/875)
-2026-06-23T14:58:28.8711436Z | Info | Counting objects:  48% (420/875)
-2026-06-23T14:58:28.8711889Z | Info | Counting objects:  49% (429/875)
-2026-06-23T14:58:28.8712323Z Counting objects:  50% (438/875)
-2026-06-23T14:58:28.8712733Z | Info | Counting objects:  51% (447/875)
-2026-06-23T14:58:28.8713181Z | Info | Counting objects:  52% (455/875)
-2026-06-23T14:58:28.8713632Z | Info | Counting objects:  53% (464/875)
-2026-06-23T14:58:28.8714241Z Counting objects:  54% (473/875)
-2026-06-23T14:58:28.8714664Z | Info | Counting objects:  55% (482/875)
-2026-06-23T14:58:28.8715118Z | Info | Counting objects:  56% (490/875)
-2026-06-23T14:58:28.8715558Z Counting objects:  57% (499/875)
-2026-06-23T14:58:28.8715966Z | Info | Counting objects:  58% (508/875)
-2026-06-23T14:58:28.8716422Z | Info | Counting objects:  59% (517/875)
-2026-06-23T14:58:28.8716862Z | Info | Counting objects:  60% (525/875)
-2026-06-23T14:58:28.8717306Z | Info | Counting objects:  61% (534/875)
-2026-06-23T14:58:28.8717753Z | Info | Counting objects:  62% (543/875)
-2026-06-23T14:58:28.8718183Z Counting objects:  63% (552/875)
-2026-06-23T14:58:28.8718703Z | Info | Counting objects:  64% (560/875)
-2026-06-23T14:58:28.8718968Z | Info | Counting objects:  65% (569/875)
-2026-06-23T14:58:28.8719237Z Counting objects:  66% (578/875)
-2026-06-23T14:58:28.8719473Z | Info | Counting objects:  67% (587/875)
-2026-06-23T14:58:28.8719724Z | Info | Counting objects:  68% (595/875)
-2026-06-23T14:58:28.8719966Z Counting objects:  69% (604/875)
-2026-06-23T14:58:28.8720195Z | Info | Counting objects:  70% (613/875)
-2026-06-23T14:58:28.8720438Z | Info | Counting objects:  71% (622/875)
-2026-06-23T14:58:28.8720680Z | Info | Counting objects:  72% (630/875)
-2026-06-23T14:58:28.8720919Z Counting objects:  73% (639/875)
-2026-06-23T14:58:28.8721178Z | Info | Counting objects:  74% (648/875)
-2026-06-23T14:58:28.8721420Z | Info | Counting objects:  75% (657/875)
-2026-06-23T14:58:28.8721662Z | Info | Counting objects:  76% (665/875)
-2026-06-23T14:58:28.8721915Z Counting objects:  77% (674/875)
-2026-06-23T14:58:28.8722144Z | Info | Counting objects:  78% (683/875)
-2026-06-23T14:58:28.8723128Z | Info | Counting objects:  79% (692/875)
-2026-06-23T14:58:28.8723389Z | Info | Counting objects:  80% (700/875)
-2026-06-23T14:58:28.8723631Z | Info | Counting objects:  81% (709/875)
-2026-06-23T14:58:28.8723870Z | Info | Counting objects:  82% (718/875)
-2026-06-23T14:58:28.8724120Z | Info | Counting objects:  83% (727/875)
-2026-06-23T14:58:28.8724362Z | Info | Counting objects:  84% (735/875)
-2026-06-23T14:58:28.8724609Z Counting objects:  85% (744/875)
-2026-06-23T14:58:28.8724836Z | Info | Counting objects:  86% (753/875)
-2026-06-23T14:58:28.8725074Z | Info | Counting objects:  87% (762/875)
-2026-06-23T14:58:28.8725317Z | Info | Counting objects:  88% (770/875)
-2026-06-23T14:58:28.8725557Z | Info | Counting objects:  89% (779/875)
-2026-06-23T14:58:28.8725790Z Counting objects:  90% (788/875)
-2026-06-23T14:58:28.8726018Z | Info | Counting objects:  91% (797/875)
-2026-06-23T14:58:28.8726252Z Counting objects:  92% (805/875)
-2026-06-23T14:58:28.8726478Z | Info | Counting objects:  93% (814/875)
-2026-06-23T14:58:28.8726726Z | Info | Counting objects:  94% (823/875)
-2026-06-23T14:58:28.8726963Z | Info | Counting objects:  95% (832/875)
-2026-06-23T14:58:28.8727201Z | Info | Counting objects:  96% (840/875)
-2026-06-23T14:58:28.8727446Z | Info | Counting objects:  97% (849/875)
-2026-06-23T14:58:28.8728187Z | Info | Counting objects:  98% (858/875)
-2026-06-23T14:58:28.8728484Z Counting objects:  99% (867/875)
-2026-06-23T14:58:28.8728713Z | Info | Counting objects: 100% (875/875)
-2026-06-23T14:58:28.8728986Z | Info | Counting objects: 100% (875/875), done.
-2026-06-23T14:58:28.8729276Z | Info | Compressing objects:   0% (1/292)
-2026-06-23T14:58:28.8729538Z Compressing objects:   1% (3/292)
-2026-06-23T14:58:28.8729788Z | Info | Compressing objects:   2% (6/292)
-2026-06-23T14:58:28.8730050Z | Info | Compressing objects:   3% (9/292)
-2026-06-23T14:58:28.8730316Z | Info | Compressing objects:   4% (12/292)
-2026-06-23T14:58:28.8730585Z | Info | Compressing objects:   5% (15/292)
-2026-06-23T14:58:28.8730851Z | Info | Compressing objects:   6% (18/292)
-2026-06-23T14:58:28.8731110Z | Info | Compressing objects:   7% (21/292)
-2026-06-23T14:58:28.8731378Z | Info | Compressing objects:   8% (24/292)
-2026-06-23T14:58:28.8731639Z | Info | Compressing objects:   9% (27/292)
-2026-06-23T14:58:28.8732028Z | Info | Compressing objects:  10% (30/292)
-2026-06-23T14:58:28.8732293Z | Info | Compressing objects:  11% (33/292)
-2026-06-23T14:58:28.8732554Z | Info | Compressing objects:  12% (36/292)
-2026-06-23T14:58:28.8732806Z | Info | Compressing objects:  13% (38/292)
-2026-06-23T14:58:28.8733060Z | Info | Compressing objects:  14% (41/292)
-2026-06-23T14:58:28.8733321Z | Info | Compressing objects:  15% (44/292)
-2026-06-23T14:58:28.8733574Z | Info | Compressing objects:  16% (47/292)
-2026-06-23T14:58:28.8733829Z | Info | Compressing objects:  17% (50/292)
-2026-06-23T14:58:28.8734082Z | Info | Compressing objects:  18% (53/292)
-2026-06-23T14:58:28.8734341Z | Info | Compressing objects:  19% (56/292)
-2026-06-23T14:58:28.8734590Z | Info | Compressing objects:  20% (59/292)
-2026-06-23T14:58:28.8734845Z | Info | Compressing objects:  21% (62/292)
-2026-06-23T14:58:28.8735094Z | Info | Compressing objects:  22% (65/292)
-2026-06-23T14:58:28.8735349Z | Info | Compressing objects:  23% (68/292)
-2026-06-23T14:58:28.8735600Z | Info | Compressing objects:  24% (71/292)
-2026-06-23T14:58:28.8735851Z | Info | Compressing objects:  25% (73/292)
-2026-06-23T14:58:28.8736102Z | Info | Compressing objects:  26% (76/292)
-2026-06-23T14:58:28.8736353Z | Info | Compressing objects:  27% (79/292)
-2026-06-23T14:58:28.8736612Z | Info | Compressing objects:  28% (82/292)
-2026-06-23T14:58:28.8736876Z | Info | Compressing objects:  29% (85/292)
-2026-06-23T14:58:28.8737127Z | Info | Compressing objects:  30% (88/292)
-2026-06-23T14:58:28.8737377Z | Info | Compressing objects:  31% (91/292)
-2026-06-23T14:58:28.8737630Z | Info | Compressing objects:  32% (94/292)
-2026-06-23T14:58:28.8737977Z | Info | Compressing objects:  33% (97/292)
-2026-06-23T14:58:28.8738252Z | Info | Compressing objects:  34% (100/292)
-2026-06-23T14:58:28.8738526Z | Info | Compressing objects:  35% (103/292)
-2026-06-23T14:58:28.8738787Z | Info | Compressing objects:  36% (106/292)
-2026-06-23T14:58:28.8739045Z | Info | Compressing objects:  37% (109/292)
-2026-06-23T14:58:28.8739307Z | Info | Compressing objects:  38% (111/292)
-2026-06-23T14:58:28.8739600Z | Info | Compressing objects:  39% (114/292)
-2026-06-23T14:58:28.8739861Z | Info | Compressing objects:  40% (117/292)
-2026-06-23T14:58:28.8740144Z | Info | Compressing objects:  41% (120/292)
-2026-06-23T14:58:28.8740402Z | Info | Compressing objects:  42% (123/292)
-2026-06-23T14:58:28.8740663Z | Info | Compressing objects:  43% (126/292)
-2026-06-23T14:58:28.8740919Z | Info | Compressing objects:  44% (129/292)
-2026-06-23T14:58:28.8741174Z | Info | Compressing objects:  45% (132/292)
-2026-06-23T14:58:28.8741439Z | Info | Compressing objects:  46% (135/292)
-2026-06-23T14:58:28.8741705Z | Info | Compressing objects:  47% (138/292)
-2026-06-23T14:58:28.8741960Z | Info | Compressing objects:  48% (141/292)
-2026-06-23T14:58:28.8742227Z | Info | Compressing objects:  49% (144/292)
-2026-06-23T14:58:28.8742484Z | Info | Compressing objects:  50% (146/292)
-2026-06-23T14:58:28.8742741Z | Info | Compressing objects:  51% (149/292)
-2026-06-23T14:58:28.8743004Z | Info | Compressing objects:  52% (152/292)
-2026-06-23T14:58:28.8743261Z | Info | Compressing objects:  53% (155/292)
-2026-06-23T14:58:28.8743518Z | Info | Compressing objects:  54% (158/292)
-2026-06-23T14:58:28.8743784Z | Info | Compressing objects:  55% (161/292)
-2026-06-23T14:58:28.8744039Z | Info | Compressing objects:  56% (164/292)
-2026-06-23T14:58:28.8744293Z | Info | Compressing objects:  57% (167/292)
-2026-06-23T14:58:28.8744551Z | Info | Compressing objects:  58% (170/292)
-2026-06-23T14:58:28.8744803Z | Info | Compressing objects:  59% (173/292)
-2026-06-23T14:58:28.8745057Z | Info | Compressing objects:  60% (176/292)
-2026-06-23T14:58:28.8745319Z | Info | Compressing objects:  61% (179/292)
-2026-06-23T14:58:28.8745571Z | Info | Compressing objects:  62% (182/292)
-2026-06-23T14:58:28.8745829Z | Info | Compressing objects:  63% (184/292)
-2026-06-23T14:58:28.8746087Z | Info | Compressing objects:  64% (187/292)
-2026-06-23T14:58:28.8746428Z | Info | Compressing objects:  65% (190/292)
-2026-06-23T14:58:28.8746693Z | Info | Compressing objects:  66% (193/292)
-2026-06-23T14:58:28.8746948Z | Info | Compressing objects:  67% (196/292)
-2026-06-23T14:58:28.8747201Z | Info | Compressing objects:  68% (199/292)
-2026-06-23T14:58:28.8747460Z | Info | Compressing objects:  69% (202/292)
-2026-06-23T14:58:28.8747713Z | Info | Compressing objects:  70% (205/292)
-2026-06-23T14:58:28.8748328Z | Info | Compressing objects:  71% (208/292)
-2026-06-23T14:58:28.8748593Z | Info | Compressing objects:  72% (211/292)
-2026-06-23T14:58:28.8748849Z | Info | Compressing objects:  73% (214/292)
-2026-06-23T14:58:28.8749112Z | Info | Compressing objects:  74% (217/292)
-2026-06-23T14:58:28.8749375Z | Info | Compressing objects:  75% (219/292)
-2026-06-23T14:58:28.8749635Z | Info | Compressing objects:  76% (222/292)
-2026-06-23T14:58:28.8749889Z | Info | Compressing objects:  77% (225/292)
-2026-06-23T14:58:28.8750149Z | Info | Compressing objects:  78% (228/292)
-2026-06-23T14:58:28.8750415Z | Info | Compressing objects:  79% (231/292)
-2026-06-23T14:58:28.8750670Z | Info | Compressing objects:  80% (234/292)
-2026-06-23T14:58:28.8750931Z | Info | Compressing objects:  81% (237/292)
-2026-06-23T14:58:28.8751187Z | Info | Compressing objects:  82% (240/292)
-2026-06-23T14:58:28.8751439Z | Info | Compressing objects:  83% (243/292)
-2026-06-23T14:58:28.8751700Z | Info | Compressing objects:  84% (246/292)
-2026-06-23T14:58:28.8751957Z | Info | Compressing objects:  85% (249/292)
-2026-06-23T14:58:28.8752218Z | Info | Compressing objects:  86% (252/292)
-2026-06-23T14:58:28.8752473Z | Info | Compressing objects:  87% (255/292)
-2026-06-23T14:58:28.8752838Z | Info | Compressing objects:  88% (257/292)
-2026-06-23T14:58:28.8753098Z | Info | Compressing objects:  89% (260/292)
-2026-06-23T14:58:28.8753368Z | Info | Compressing objects:  90% (263/292)
-2026-06-23T14:58:28.8753630Z | Info | Compressing objects:  91% (266/292)
-2026-06-23T14:58:28.8753888Z | Info | Compressing objects:  92% (269/292)
-2026-06-23T14:58:28.8754149Z | Info | Compressing objects:  93% (272/292)
-2026-06-23T14:58:28.8754402Z | Info | Compressing objects:  94% (275/292)
-2026-06-23T14:58:28.8754658Z | Info | Compressing objects:  95% (278/292)
-2026-06-23T14:58:28.8754920Z | Info | Compressing objects:  96% (281/292)
-2026-06-23T14:58:28.8755178Z | Info | Compressing objects:  97% (284/292)
-2026-06-23T14:58:28.8755436Z | Info | Compressing objects:  98% (287/292)
-2026-06-23T14:58:28.8755696Z | Info | Compressing objects:  99% (290/292)
-2026-06-23T14:58:28.8755954Z | Info | Compressing objects: 100% (292/292)
-2026-06-23T14:58:28.8756237Z | Info | Compressing objects: 100% (292/292), done.
-2026-06-23T14:58:37.8539950Z | Info | Total 59063 (delta 755), reused 608 (delta 583), pack-reused 58188 (from 3)
-2026-06-23T14:58:42.0759407Z | Info | Set GEODE_SDK environment variable automatically
-2026-06-23T14:58:42.1276604Z | Info | Updating head
-2026-06-23T14:58:42.1952075Z | Done | Updated head to v5.7.1
-2026-06-23T14:58:42.1952531Z | Done | Successfully installed SDK
-2026-06-23T14:58:42.1953286Z | Info | Please restart your command line to have the GEODE_SDK enviroment variable set.
-2026-06-23T14:58:42.1954246Z | Info | Use `geode sdk install-binaries` to install pre-built binaries
-2026-06-23T14:58:42.2282927Z | Info | Switching to v5.7.1
-2026-06-23T14:58:42.2283355Z | Info | Updating SDK
-2026-06-23T14:58:42.3753309Z | Info | Updating head
-2026-06-23T14:58:42.4556977Z | Info | Switched to v5.7.1
-2026-06-23T14:58:42.4557449Z | Done | Successfully updated SDK.
-2026-06-23T14:58:42.4863696Z | Info | Installing binaries for 5.7.1
-2026-06-23T14:58:42.7344137Z | Info | Found binaries for platform Windows
-2026-06-23T14:58:42.7346697Z | Info | Downloading
-2026-06-23T14:58:43.3627259Z | Done | Binaries installed
-2026-06-23T14:58:43.3859301Z ##[group]Run mkdir -p $HOME/.cache
-2026-06-23T14:58:43.3859629Z [36;1mmkdir -p $HOME/.cache[0m
-2026-06-23T14:58:43.3859855Z [36;1m[0m
-2026-06-23T14:58:43.3860826Z [36;1mNDK_PATH="/usr/local/lib/android/sdk/ndk/"[0m
-2026-06-23T14:58:43.3861148Z [36;1mif [ "" = "" ]; then[0m
-2026-06-23T14:58:43.3861404Z [36;1m  NDK_PATH="$ANDROID_NDK_LATEST_HOME"[0m
-2026-06-23T14:58:43.3861681Z [36;1mfi[0m
-2026-06-23T14:58:43.3861851Z [36;1m[0m
-2026-06-23T14:58:43.3862025Z [36;1mcd "./"[0m
-2026-06-23T14:58:43.3862215Z [36;1mCMAKE_EXTRA_ARGS=""[0m
-2026-06-23T14:58:43.3862447Z [36;1mif [ win = "mac" ]; then[0m
-2026-06-23T14:58:43.3863089Z [36;1m  CMAKE_EXTRA_ARGS="-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DGEODE_DISABLE_PRECOMPILED_HEADERS=OFF -DCMAKE_AR='/usr/bin/ar' -DCMAKE_RANLIB='/usr/bin/ranlib'"[0m
-2026-06-23T14:58:43.3863763Z [36;1melif [ win = "android32" ]; then[0m
-2026-06-23T14:58:43.3864757Z [36;1m  CMAKE_EXTRA_ARGS="-DCMAKE_TOOLCHAIN_FILE=$NDK_PATH/build/cmake/android.toolchain.cmake -DANDROID_STL=c++_shared -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-23"[0m
-2026-06-23T14:58:43.3865495Z [36;1melif [ win = "android64" ]; then[0m
-2026-06-23T14:58:43.3866209Z [36;1m  CMAKE_EXTRA_ARGS="-DCMAKE_TOOLCHAIN_FILE=$NDK_PATH/build/cmake/android.toolchain.cmake -DANDROID_STL=c++_shared -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-23"[0m
-2026-06-23T14:58:43.3866920Z [36;1melif [ win = "ios" ]; then[0m
-2026-06-23T14:58:43.3867427Z [36;1m  CMAKE_EXTRA_ARGS="-DCMAKE_SYSTEM_NAME=iOS -DGEODE_TARGET_PLATFORM=iOS -DGEODE_DISABLE_PRECOMPILED_HEADERS=OFF"[0m
-2026-06-23T14:58:43.3867939Z [36;1mfi[0m
-2026-06-23T14:58:43.3868117Z [36;1mif [ "true" = "true" ]; then[0m
-2026-06-23T14:58:43.3868510Z [36;1m  CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON"[0m
-2026-06-23T14:58:43.3869051Z [36;1mfi[0m
-2026-06-23T14:58:43.3869268Z [36;1mif [ "false" = "true" ] && [ win = "win" ]; then[0m
-2026-06-23T14:58:43.3869649Z [36;1m  CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DGEODE_BUNDLE_PDB=ON"[0m
-2026-06-23T14:58:43.3869967Z [36;1mfi[0m
-2026-06-23T14:58:43.3870141Z [36;1mif [ -n "sccache" ]; then[0m
-2026-06-23T14:58:43.3870401Z [36;1m  CCACHE_PATH="$(which "sccache")"[0m
-2026-06-23T14:58:43.3870961Z [36;1m  CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DCMAKE_C_COMPILER_LAUNCHER=${CCACHE_PATH} -DCMAKE_CXX_COMPILER_LAUNCHER=${CCACHE_PATH}"[0m
-2026-06-23T14:58:43.3871496Z [36;1mfi[0m
-2026-06-23T14:58:43.3872465Z [36;1mcmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DGEODE_CODEGEN_CMAKE_ARGS="-DCMAKE_C_COMPILER=clang;-DCMAKE_CXX_COMPILER=clang++;-G Ninja" -G Ninja $CMAKE_EXTRA_ARGS -DGEODE_DONT_INSTALL_MODS=ON -DGEODE_TARGET_PLATFORM=Win64 [0m
-2026-06-23T14:58:43.3873590Z [36;1mcmake --build build --config Release  --parallel[0m
-2026-06-23T14:58:43.3873900Z [36;1m[0m
-2026-06-23T14:58:43.3874090Z [36;1mmkdir "D:\a\zvella\zvella/output"[0m
-2026-06-23T14:58:43.3874344Z [36;1m[0m
-2026-06-23T14:58:43.3874567Z [36;1mfor file in $(find ./build -name *.geode); do[0m
-2026-06-23T14:58:43.3874893Z [36;1m  cp $file "D:\a\zvella\zvella/output"[0m
-2026-06-23T14:58:43.3875219Z [36;1m  if [ win = "linux" ] && [ "false" = "true" ]; then[0m
-2026-06-23T14:58:43.3875571Z [36;1m    if [ win = "android32" ] || [ win = "android64" ]; then[0m
-2026-06-23T14:58:43.3875930Z [36;1m      SO_FILE_NAME="$(basename $file .geode).win.so"[0m
-2026-06-23T14:58:43.3876254Z [36;1m      if [ -f "./build/$SO_FILE_NAME" ]; then[0m
-2026-06-23T14:58:43.3876686Z [36;1m        dump_syms ./build/$SO_FILE_NAME -o "D:\a\zvella\zvella/output/$SO_FILE_NAME.sym"[0m
-2026-06-23T14:58:43.3877091Z [36;1m      fi[0m
-2026-06-23T14:58:43.3877263Z [36;1m    fi[0m
-2026-06-23T14:58:43.3877431Z [36;1m  fi[0m
-2026-06-23T14:58:43.3877613Z [36;1mdone[0m
-2026-06-23T14:58:43.3877776Z [36;1m[0m
-2026-06-23T14:58:43.3877942Z [36;1mif [ win = "win" ]; then[0m
-2026-06-23T14:58:43.3878185Z [36;1m  if [ "false" = "true" ]; then[0m
-2026-06-23T14:58:43.3878480Z [36;1m    for file in $(find ./build -name *.pdb); do[0m
-2026-06-23T14:58:43.3878801Z [36;1m      cp $file "D:\a\zvella\zvella/output"[0m
-2026-06-23T14:58:43.3879320Z [36;1m    done[0m
-2026-06-23T14:58:43.3879646Z [36;1m  fi[0m
-2026-06-23T14:58:43.3879837Z [36;1mfi[0m
-2026-06-23T14:58:43.3880002Z [36;1m[0m
-2026-06-23T14:58:43.3880175Z [36;1mif [ "false" = "true" ]; then[0m
-2026-06-23T14:58:43.3880458Z [36;1m  for file in $(find ./build -name *.pdb); do[0m
-2026-06-23T14:58:43.3880773Z [36;1m    cp $file "D:\a\zvella\zvella/output"[0m
-2026-06-23T14:58:43.3881028Z [36;1m  done[0m
-2026-06-23T14:58:43.3881240Z [36;1m  for file in $(find ./build -name *.dbg); do[0m
-2026-06-23T14:58:43.3881549Z [36;1m    cp $file "D:\a\zvella\zvella/output"[0m
-2026-06-23T14:58:43.3881813Z [36;1m  done[0m
-2026-06-23T14:58:43.3882027Z [36;1m  for dir in $(find ./build -name *.dSYM); do[0m
-2026-06-23T14:58:43.3882334Z [36;1m    cp -R $dir "D:\a\zvella\zvella/output"[0m
-2026-06-23T14:58:43.3882591Z [36;1m  done[0m
-2026-06-23T14:58:43.3882757Z [36;1mfi[0m
-2026-06-23T14:58:43.3882916Z [36;1m[0m
-2026-06-23T14:58:43.3883108Z [36;1mOUTPUT_DIR="D:\a\zvella\zvella/output"[0m
-2026-06-23T14:58:43.3883386Z [36;1mif [ win = "mac" ]; then[0m
-2026-06-23T14:58:43.3883811Z [36;1m  OUTPUT_DIR=$(python3 -c 'import os, sys; print(os.path.realpath(sys.argv[1]))' "$OUTPUT_DIR")[0m
-2026-06-23T14:58:43.3884439Z [36;1melif [ win = "win" ]; then[0m
-2026-06-23T14:58:43.3884712Z [36;1m  OUTPUT_DIR=$(cygpath -wa "$OUTPUT_DIR")[0m
-2026-06-23T14:58:43.3884973Z [36;1melse[0m
-2026-06-23T14:58:43.3885171Z [36;1m  OUTPUT_DIR=$(realpath "$OUTPUT_DIR")[0m
-2026-06-23T14:58:43.3885428Z [36;1mfi[0m
-2026-06-23T14:58:43.3885636Z [36;1mecho "output=$OUTPUT_DIR" >> $GITHUB_OUTPUT[0m
-2026-06-23T14:58:43.3897648Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
-2026-06-23T14:58:43.3898040Z env:
-2026-06-23T14:58:43.3898256Z   GEODE_SDK: D:\a\zvella\zvella/geode-sdk-clone
-2026-06-23T14:58:43.3898568Z   CPM_SOURCE_CACHE: D:\a\zvella\zvella/cpm-cache
-2026-06-23T14:58:43.3898837Z ##[endgroup]
-2026-06-23T14:59:11.5087810Z -- The CXX compiler identification is Clang 20.1.8 with GNU-like command-line
-2026-06-23T14:59:25.5548072Z -- The C compiler identification is Clang 20.1.8 with GNU-like command-line
-2026-06-23T14:59:25.9711769Z -- Detecting CXX compiler ABI info
-2026-06-23T14:59:32.4189534Z -- Detecting CXX compiler ABI info - done
-2026-06-23T14:59:32.4715305Z -- Check for working CXX compiler: C:/Program Files/LLVM/bin/clang++.exe - skipped
-2026-06-23T14:59:32.4801545Z -- Detecting CXX compile features
-2026-06-23T14:59:33.2545431Z -- Detecting CXX compile features - done
-2026-06-23T14:59:33.2984278Z -- Detecting C compiler ABI info
-2026-06-23T14:59:36.3650675Z -- Detecting C compiler ABI info - done
-2026-06-23T14:59:36.4019850Z -- Check for working C compiler: C:/Program Files/LLVM/bin/clang.exe - skipped
-2026-06-23T14:59:36.4024189Z -- Detecting C compile features
-2026-06-23T14:59:36.4031025Z -- Detecting C compile features - done
-2026-06-23T14:59:36.5234211Z CMake Warning (dev) at C:/Program Files/CMake/share/cmake-4.3/Modules/FetchContent.cmake:1966 (message):
-2026-06-23T14:59:36.5235281Z   Calling FetchContent_Populate(spout2) is deprecated, call
-2026-06-23T14:59:36.5236114Z   FetchContent_MakeAvailable(spout2) instead.  Policy CMP0169 can be set to
-2026-06-23T14:59:36.5237054Z   OLD to allow FetchContent_Populate(spout2) to be called directly for now,
-2026-06-23T14:59:36.5237868Z   but the ability to call it with declared details will be removed completely
-2026-06-23T14:59:36.5238250Z   in a future version.
-2026-06-23T14:59:36.5238482Z Call Stack (most recent call first):
-2026-06-23T14:59:36.5238777Z   CMakeLists.txt:40 (FetchContent_Populate)
-2026-06-23T14:59:36.5239423Z This warning is for project developers.  Use -Wno-dev to suppress it.
-2026-06-23T14:59:36.5239949Z 
-2026-06-23T15:00:02.2475792Z -- GitHub Actions build detected
-2026-06-23T15:00:02.2476178Z -- Found Geode: D:\a\zvella\zvella/geode-sdk-clone
-2026-06-23T15:00:02.2491996Z -- Version: 5.7.1
-2026-06-23T15:00:02.2568630Z -- No override path for bindings provided, using CPM to clone default. If you would like to use a separate clone of the bindings repo (for example in order to be able to efficiently change and contribute new bindings) then set GEODE_BINDINGS_REPO_PATH to where you have cloned the repository (system environment variables are supported).
-2026-06-23T15:00:02.2571694Z -- CPM: Adding package bindings@ (main)
-2026-06-23T15:00:02.2584487Z -- Populating bindings
-2026-06-23T15:00:02.3232474Z -- Configuring done (0.0s)
-2026-06-23T15:00:02.3427375Z -- Generating done (0.0s)
-2026-06-23T15:00:02.3435979Z -- Build files have been written to: D:/a/zvella/zvella/build/_deps/bindings-subbuild
-2026-06-23T15:00:02.4202166Z [1/9] Creating directories for 'bindings-populate'
-2026-06-23T15:00:02.4204119Z [1/9] Performing download step (git clone) for 'bindings-populate'
-2026-06-23T15:00:02.4755325Z Cloning into 'bindings-src'...
-2026-06-23T15:00:09.6896686Z Already on 'main'
-2026-06-23T15:00:09.6919711Z Your branch is up to date with 'origin/main'.
-2026-06-23T15:00:10.2408736Z [2/9] Performing update step for 'bindings-populate'
-2026-06-23T15:00:10.2986623Z -- Fetching latest from the remote origin
-2026-06-23T15:00:11.4128406Z [3/9] No patch step for 'bindings-populate'
-2026-06-23T15:00:11.4982496Z [5/9] No configure step for 'bindings-populate'
-2026-06-23T15:00:11.5404206Z [6/9] No build step for 'bindings-populate'
-2026-06-23T15:00:11.5822369Z [7/9] No install step for 'bindings-populate'
-2026-06-23T15:00:11.6248132Z [8/9] No test step for 'bindings-populate'
-2026-06-23T15:00:11.6837270Z [9/9] Completed 'bindings-populate'
-2026-06-23T15:00:11.6891998Z -- Looking for ccache/sccache
-2026-06-23T15:00:11.6892799Z -- Looking for ccache/sccache - detecting variant
-2026-06-23T15:00:11.6893229Z -- Looking for ccache/sccache - detected sccache
-2026-06-23T15:00:11.6893796Z Using sccache with Clang, PCH will be enabled.
-2026-06-23T15:00:11.6894293Z -- Pre-compiled headers - ON
-2026-06-23T15:00:11.7048680Z -- Found Geode CLI: D:/a/zvella/zvella/my-epic-geode-cli/geode.exe (version 3.7.4)
-2026-06-23T15:00:11.7081013Z -- Found Git: C:/Program Files/Git/mingw64/bin/git.exe (found version "2.54.0.windows.1")
-2026-06-23T15:00:11.7503262Z -- CPM: Adding package result@1.4.1 (v1.4.1 at D:/a/zvella/zvella/cpm-cache/result/1b9c)
-2026-06-23T15:00:11.7975485Z -- CPM: Adding package json@3.3.0 (v3.3.0 at D:/a/zvella/zvella/cpm-cache/json/75ca)
-2026-06-23T15:00:12.3531641Z -- CPM: Adding package nontype_functional@6 (6d1d08c at D:/a/zvella/zvella/cpm-cache/nontype_functional/aaa0)
-2026-06-23T15:00:12.5275111Z -- {fmt} version: 12.1.0
-2026-06-23T15:00:12.5275473Z -- Build type: Release
-2026-06-23T15:00:12.6034469Z -- Performing Test HAS_NULLPTR_WARNING
-2026-06-23T15:00:19.4453708Z -- Performing Test HAS_NULLPTR_WARNING - Success
-2026-06-23T15:00:19.4468042Z -- CPM: Adding package fmt@12.1.0 (12.1.0 at D:/a/zvella/zvella/cpm-cache/fmt/6226)
-2026-06-23T15:00:19.5479199Z -- CPM: Adding package asp2@51 (51d3773 at D:/a/zvella/zvella/cpm-cache/asp2/4dd3)
-2026-06-23T15:00:19.6043405Z -- Arc features: time
-2026-06-23T15:00:19.6055025Z -- CPM: Adding package arc@1.5.5 (v1.5.5 at D:/a/zvella/zvella/cpm-cache/arc/70cb)
-2026-06-23T15:00:19.6665402Z -- CPM: Adding package TulipHook@3.1.11 (v3.1.11 at D:/a/zvella/zvella/cpm-cache/tuliphook/37c6)
-2026-06-23T15:00:19.6679084Z -- Performing Test SUPPORTS_W_NO_EVERYTHING
-2026-06-23T15:00:19.9591654Z -- Performing Test SUPPORTS_W_NO_EVERYTHING - Success
-2026-06-23T15:00:19.9612177Z -- Downloading Codegen
-2026-06-23T15:00:19.9612911Z Set SKIP_BUILDING_CODEGEN to OFF to force codegen to build locally.
-2026-06-23T15:00:20.5617182Z -- Downloading Codegen - success
-2026-06-23T15:00:20.5617783Z -- Skipping building Codegen
-2026-06-23T15:00:20.5618161Z -- Running Codegen
-2026-06-23T15:00:21.8116655Z './Codegen' 'Win64' 'D:/a/zvella/zvella/build/_deps/bindings-src/bindings/2.2081' 'D:/a/zvella/zvella/build/bindings/bindings'
-2026-06-23T15:00:21.8117349Z -- Setting up LayoutOBSBypass
-2026-06-23T15:00:21.8504430Z -- Mod layoutmode.obs-bypass is compiling for Geode version 5.7.1
-2026-06-23T15:00:21.8505017Z -- Mod layoutmode.obs-bypass is compiling for Geometry Dash version 2.2081
-2026-06-23T15:00:21.8687511Z -- Skipping installing LayoutOBSBypass
-2026-06-23T15:00:21.8697543Z -- Configuring done (95.4s)
-2026-06-23T15:00:22.1201807Z -- Generating done (0.2s)
-2026-06-23T15:00:22.1214395Z -- Build files have been written to: D:/a/zvella/zvella/build
-2026-06-23T15:00:22.2292102Z [0/2] Re-checking globbed directories...
-2026-06-23T15:00:57.8771335Z [1/42] Building CXX object _deps/fmt-build/CMakeFiles/fmt.dir/src/os.cc.obj
-2026-06-23T15:00:59.7885047Z [2/42] Building CXX object _deps/asp2-build/CMakeFiles/asp.dir/Unity/unity_0_cxx.cxx.obj
-2026-06-23T15:00:59.9800963Z [3/42] Building CXX object _deps/arc-build/CMakeFiles/arc.dir/Unity/unity_0_cxx.cxx.obj
-2026-06-23T15:01:00.1063135Z [4/42] Building CXX object _deps/fmt-build/CMakeFiles/fmt.dir/src/format.cc.obj
-2026-06-23T15:01:00.1085567Z In file included from D:/a/zvella/zvella/cpm-cache/fmt/6226/src/format.cc:8:
-2026-06-23T15:01:00.1119964Z In file included from D:/a/zvella/zvella/cpm-cache/fmt/6226/include\fmt/format-inl.h:23:
-2026-06-23T15:01:00.1151193Z In file included from D:/a/zvella/zvella/cpm-cache/fmt/6226/include\fmt\format.h:41:
-2026-06-23T15:01:00.1156493Z D:/a/zvella/zvella/cpm-cache/fmt/6226/include\fmt\base.h:930:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
-2026-06-23T15:01:00.1167359Z   930 |     isalpha('x', loc);
-2026-06-23T15:01:00.1168761Z       |     ^~~~~~~ ~~~~~~~~
-2026-06-23T15:01:00.1178407Z D:/a/zvella/zvella/cpm-cache/fmt/6226/src/format.cc:13:30: note: in instantiation of function template specialization 'fmt::locale_ref::locale_ref<std::locale, 0>' requested here
-2026-06-23T15:01:00.1180887Z    13 | template FMT_API locale_ref::locale_ref(const std::locale& loc);  // DEPRECATED!
-2026-06-23T15:01:00.1182575Z       |                              ^
-2026-06-23T15:01:00.1199579Z 1 warning generated.
-2026-06-23T15:01:00.2268211Z [5/42] Linking CXX static library _deps\fmt-build\fmt.lib
-2026-06-23T15:01:00.3278543Z [6/42] Linking CXX static library _deps\asp2-build\asp.lib
-2026-06-23T15:01:00.4429656Z [7/42] Linking CXX static library _deps\arc-build\arc.lib
-2026-06-23T15:01:00.8339199Z [8/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutCopy.cpp.obj
-2026-06-23T15:01:00.9505903Z [9/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutFrameCount.cpp.obj
-2026-06-23T15:01:01.3239573Z [10/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutDirectX.cpp.obj
-2026-06-23T15:01:01.5142722Z [11/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/Spout.cpp.obj
-2026-06-23T15:01:01.5335583Z D:/a/zvella/zvella/build/_deps/spout2-src/SPOUTSDK/SpoutGL/Spout.cpp:1919:31: warning: address of array 'driverversion' will always evaluate to 'true' [-Wpointer-bool-conversion]
-2026-06-23T15:01:01.5503575Z  1919 |                         if (!driverdescription || !driverversion) {
-2026-06-23T15:01:01.5674575Z       |                                                   ~^~~~~~~~~~~~~
-2026-06-23T15:01:01.5842482Z D:/a/zvella/zvella/build/_deps/spout2-src/SPOUTSDK/SpoutGL/Spout.cpp:1919:9: warning: address of array 'driverdescription' will always evaluate to 'true' [-Wpointer-bool-conversion]
-2026-06-23T15:01:01.6086342Z  1919 |                         if (!driverdescription || !driverversion) {
-2026-06-23T15:01:01.6361956Z       |                             ~^~~~~~~~~~~~~~~~~
-2026-06-23T15:01:01.6622023Z 2 warnings generated.
-2026-06-23T15:01:01.8770324Z [12/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutGLextensions.cpp.obj
-2026-06-23T15:01:01.9012853Z [13/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutGL.cpp.obj
-2026-06-23T15:01:01.9176627Z D:/a/zvella/zvella/build/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutGL.cpp:798:8: warning: comparison of different enumeration types in switch statement ('DXGI_FORMAT' and '_D3DFORMAT') [-Wenum-compare-switch]
-2026-06-23T15:01:01.9361161Z   795 |         switch (d3dformat) {
-2026-06-23T15:01:01.9474444Z       |                 ~~~~~~~~~
-2026-06-23T15:01:01.9552459Z   796 |                 // DirectX 9
-2026-06-23T15:01:01.9791193Z   797 |                 case D3DFMT_A8R8G8B8:
-2026-06-23T15:01:01.9897154Z   798 |                 case D3DFMT_X8R8G8B8:
-2026-06-23T15:01:02.0350551Z       |                      ^~~~~~~~~~~~~~~
-2026-06-23T15:01:02.0576917Z D:/a/zvella/zvella/build/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutGL.cpp:797:8: warning: comparison of different enumeration types in switch statement ('DXGI_FORMAT' and '_D3DFORMAT') [-Wenum-compare-switch]
-2026-06-23T15:01:02.0635132Z   795 |         switch (d3dformat) {
-2026-06-23T15:01:02.0635650Z       |                 ~~~~~~~~~
-2026-06-23T15:01:02.0636146Z   796 |                 // DirectX 9
-2026-06-23T15:01:02.0636645Z   797 |                 case D3DFMT_A8R8G8B8:
-2026-06-23T15:01:02.0637130Z       |                      ^~~~~~~~~~~~~~~
-2026-06-23T15:01:02.0637573Z 2 warnings generated.
-2026-06-23T15:01:02.4632010Z [14/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutSender.cpp.obj
-2026-06-23T15:01:02.5103378Z [15/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutSenderNames.cpp.obj
-2026-06-23T15:01:02.5524806Z [16/42] Running Codegen
-2026-06-23T15:01:02.9372119Z [17/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutSharedMemory.cpp.obj
-2026-06-23T15:01:02.9970901Z [18/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutUtils.cpp.obj
-2026-06-23T15:01:05.2247613Z [19/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_14_cxx.cxx.obj
-2026-06-23T15:01:05.2448322Z [20/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_13_cxx.cxx.obj
-2026-06-23T15:01:05.2687921Z [21/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_12_cxx.cxx.obj
-2026-06-23T15:01:06.6329066Z [22/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_10_cxx.cxx.obj
-2026-06-23T15:01:06.6511764Z [23/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_9_cxx.cxx.obj
-2026-06-23T15:01:06.6668529Z [24/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_11_cxx.cxx.obj
-2026-06-23T15:01:08.0732208Z [25/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_8_cxx.cxx.obj
-2026-06-23T15:01:08.0787912Z [26/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_7_cxx.cxx.obj
-2026-06-23T15:01:08.2173228Z [27/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_6_cxx.cxx.obj
-2026-06-23T15:01:09.5173880Z [28/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_5_cxx.cxx.obj
-2026-06-23T15:01:09.5286633Z [29/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_4_cxx.cxx.obj
-2026-06-23T15:01:09.6490702Z [30/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_2_cxx.cxx.obj
-2026-06-23T15:01:10.0707093Z [31/42] Linking CXX static library SpoutGL_static.lib
-2026-06-23T15:01:10.8396401Z [32/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_1_cxx.cxx.obj
-2026-06-23T15:01:10.8502759Z [33/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_3_cxx.cxx.obj
-2026-06-23T15:01:11.0346097Z [34/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_0_cxx.cxx.obj
-2026-06-23T15:01:11.4008077Z [35/42] Linking CXX static library bindings\GeodeBindings.lib
-2026-06-23T15:01:11.5908539Z [36/42] Building CXX object CMakeFiles/LayoutOBSBypass.dir/src/SpoutWrapper.cpp.obj
-2026-06-23T15:01:20.3583396Z [37/42] Building CXX object CMakeFiles/LayoutOBSBypass.dir/cmake_pch.hxx.pch
-2026-06-23T15:01:21.5868880Z [38/42] Building CXX object CMakeFiles/LayoutOBSBypass.dir/geode-sdk-clone/entry.cpp.obj
-2026-06-23T15:01:24.2178650Z [39/42] Building CXX object CMakeFiles/LayoutOBSBypass.dir/src/main.cpp.obj
-2026-06-23T15:01:24.2179787Z FAILED: [code=1] CMakeFiles/LayoutOBSBypass.dir/src/main.cpp.obj 
-2026-06-23T15:01:24.2191479Z C:\Users\runneradmin\.cargo\bin\sccache C:\PROGRA~1\LLVM\bin\CLANG_~1.EXE -DARC_FEATURE_TIME=1 -DGEODE_COMP_GD_VERSION=22081 -DGEODE_GD_VERSION=2.2081 -DGEODE_GD_VERSION_STRING=\"2.2081\" -DGEODE_MOD_ID=\"layoutmode.obs-bypass\" -DLayoutOBSBypass_EXPORTS -DMAT_JSON_DYNAMIC=1 -DNOMINMAX -DPROJECT_NAME=LayoutOBSBypass -D_HAS_ITERATOR_DEBUGGING=0 -ID:/a/zvella/zvella/src -ID:/a/zvella/zvella/build/_deps/spout2-src/SPOUTSDK/SpoutGL -ID:/a/zvella/zvella/geode-sdk-clone/loader/include -ID:/a/zvella/zvella/geode-sdk-clone/loader/include/Geode/cocos/include -ID:/a/zvella/zvella/geode-sdk-clone/loader/include/Geode/cocos/extensions -ID:/a/zvella/zvella/geode-sdk-clone/loader/include/Geode/fmod -isystem D:/a/zvella/zvella/build/bindings/bindings -isystem D:/a/zvella/zvella/build/_deps/bindings-src/bindings/include -isystem D:/a/zvella/zvella/cpm-cache/fmt/6226/include -isystem D:/a/zvella/zvella/cpm-cache/tuliphook/37c6/include -isystem D:/a/zvella/zvella/cpm-cache/result/1b9c/include -isystem D:/a/zvella/zvella/cpm-cache/json/75ca/include -isystem D:/a/zvella/zvella/cpm-cache/nontype_functional/aaa0/include -isystem D:/a/zvella/zvella/cpm-cache/asp2/4dd3/include -isystem D:/a/zvella/zvella/cpm-cache/arc/70cb/include -O3 -DNDEBUG -std=gnu++23 -D_DLL -D_MT -Xclang --dependent-lib=msvcrt -flto=thin --target=x86_64-pc-windows-msvc -Werror=return-type -Xclang -include-pch -Xclang D:/a/zvella/zvella/build/CMakeFiles/LayoutOBSBypass.dir/cmake_pch.hxx.pch -Xclang -include -Xclang D:/a/zvella/zvella/build/CMakeFiles/LayoutOBSBypass.dir/cmake_pch.hxx -MD -MT CMakeFiles/LayoutOBSBypass.dir/src/main.cpp.obj -MF CMakeFiles\LayoutOBSBypass.dir\src\main.cpp.obj.d -o CMakeFiles/LayoutOBSBypass.dir/src/main.cpp.obj -c D:/a/zvella/zvella/src/main.cpp
-2026-06-23T15:01:24.2201833Z In file included from D:/a/zvella/zvella/src/main.cpp:7:
-2026-06-23T15:01:24.2202305Z D:/a/zvella/zvella/src\LayoutConfig.hpp:9:1: error: expected unqualified-id
-2026-06-23T15:01:24.2202724Z     9 | 11: 
-2026-06-23T15:01:24.2202909Z       | ^
-2026-06-23T15:01:24.2203235Z D:/a/zvella/zvella/src\LayoutConfig.hpp:12:1: error: expected unqualified-id
-2026-06-23T15:01:24.2203632Z    12 | 14: 
-2026-06-23T15:01:24.2203811Z       | ^
-2026-06-23T15:01:24.2204139Z D:/a/zvella/zvella/src\LayoutConfig.hpp:15:1: error: expected unqualified-id
-2026-06-23T15:01:24.2204554Z    15 | 17: 
-2026-06-23T15:01:24.2204730Z       | ^
-2026-06-23T15:01:24.2205049Z D:/a/zvella/zvella/src\LayoutConfig.hpp:24:1: error: expected unqualified-id
-2026-06-23T15:01:24.2205604Z    24 | 26: }
-2026-06-23T15:01:24.2205786Z       | ^
-2026-06-23T15:01:24.2206206Z D:/a/zvella/zvella/src/main.cpp:92:27: error: no member named 'isDecoration' in namespace 'LayoutConfig'
-2026-06-23T15:01:24.2206903Z    92 |         if (LayoutConfig::isDecoration(obj->m_objectID, obj->m_objectType)) {
-2026-06-23T15:01:24.2207310Z       |             ~~~~~~~~~~~~~~^
-2026-06-23T15:01:24.2207579Z In file included from <built-in>:1:
-2026-06-23T15:01:24.2208030Z In file included from D:\a\zvella\zvella\build\CMakeFiles\LayoutOBSBypass.dir\cmake_pch.hxx:6:
-2026-06-23T15:01:24.2208682Z In file included from D:\a\zvella\zvella\geode-sdk-clone\loader\include\Geode\Geode.hpp:7:
-2026-06-23T15:01:24.2210165Z D:\a\zvella\zvella\geode-sdk-clone\loader\include\Geode\modify\Modify.hpp:438:17: error: static assertion failed due to requirement 'alwaysFalse<DualPauseLayer>': Modified class not recognized, please include <Geode/modify/ClassName.hpp> to be able to use it.
-2026-06-23T15:01:24.2211339Z   438 |                 alwaysFalse<Derived>,
-2026-06-23T15:01:24.2211639Z       |                 ^~~~~~~~~~~~~~~~~~~~
-2026-06-23T15:01:24.2212816Z D:\a\zvella\zvella\geode-sdk-clone\loader\include\Geode\modify\Modify.hpp:457:61: note: in instantiation of member function 'geode::modifier::ModifyDerive<DualPauseLayer, PauseLayer>::ModifyDerive' requested here
-2026-06-23T15:01:24.2214455Z   457 |         static inline modifier::ModifyDerive<Derived, Base> s_apply;
-2026-06-23T15:01:24.2214850Z       |                                                             ^
-2026-06-23T15:01:24.2216738Z D:\a\zvella\zvella\geode-sdk-clone\loader\include\Geode\modify\Modify.hpp:459:50: note: in instantiation of static data member 'geode::Modify<DualPauseLayer, PauseLayer>::s_apply' requested here
-2026-06-23T15:01:24.2217721Z   459 |         static inline auto s_applyRef = &Modify::s_apply;
-2026-06-23T15:01:24.2218203Z       |                                                  ^
-2026-06-23T15:01:24.2219261Z D:\a\zvella\zvella\geode-sdk-clone\loader\include\Geode\modify\Modify.hpp:438:17: error: static assertion failed due to requirement 'alwaysFalse<DualEndLevelLayer>': Modified class not recognized, please include <Geode/modify/ClassName.hpp> to be able to use it.
-2026-06-23T15:01:24.2220321Z   438 |                 alwaysFalse<Derived>,
-2026-06-23T15:01:24.2220591Z       |                 ^~~~~~~~~~~~~~~~~~~~
-2026-06-23T15:01:24.2221468Z D:\a\zvella\zvella\geode-sdk-clone\loader\include\Geode\modify\Modify.hpp:457:61: note: in instantiation of member function 'geode::modifier::ModifyDerive<DualEndLevelLayer, EndLevelLayer>::ModifyDerive' requested here
-2026-06-23T15:01:24.2222422Z   457 |         static inline modifier::ModifyDerive<Derived, Base> s_apply;
-2026-06-23T15:01:24.2222810Z       |                                                             ^
-2026-06-23T15:01:24.2223860Z D:\a\zvella\zvella\geode-sdk-clone\loader\include\Geode\modify\Modify.hpp:459:50: note: in instantiation of static data member 'geode::Modify<DualEndLevelLayer, EndLevelLayer>::s_apply' requested here
-2026-06-23T15:01:24.2224719Z   459 |         static inline auto s_applyRef = &Modify::s_apply;
-2026-06-23T15:01:24.2225055Z       |                                                  ^
-2026-06-23T15:01:24.2225320Z 7 errors generated.
-2026-06-23T15:01:24.2225566Z ninja: build stopped: subcommand failed.
-2026-06-23T15:01:24.2306578Z ##[error]Process completed with exit code 1.
-2026-06-23T15:01:24.2713237Z Post job cleanup.
-2026-06-23T15:01:24.2876720Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
-2026-06-23T15:01:24.2878006Z Post job cleanup.
-2026-06-23T15:01:24.4217509Z (node:9328) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-2026-06-23T15:01:24.4218251Z (Use `node --trace-deprecation ...` to show where the warning was created)
-2026-06-23T15:01:24.5801336Z ##[group]sccache stats
-2026-06-23T15:01:24.6602840Z [command]C:\Users\runneradmin\.cargo\bin\sccache.exe -s
-2026-06-23T15:01:24.6798395Z Compile requests                     33
-2026-06-23T15:01:24.6799249Z Compile requests executed            33
-2026-06-23T15:01:24.6799772Z Cache hits                           31
-2026-06-23T15:01:24.6800190Z Cache hits (C/C++)                   31
-2026-06-23T15:01:24.6800591Z Cache misses                          1
-2026-06-23T15:01:24.6801036Z Cache misses (C/C++)                  1
-2026-06-23T15:01:24.6801458Z Cache hits rate                   96.88 %
-2026-06-23T15:01:24.6801878Z Cache hits rate (C/C++)           96.88 %
-2026-06-23T15:01:24.6802307Z Cache timeouts                        0
-2026-06-23T15:01:24.6802707Z Cache read errors                     0
-2026-06-23T15:01:24.6803113Z Forced recaches                       0
-2026-06-23T15:01:24.6803538Z Cache write errors                    0
-2026-06-23T15:01:24.6803935Z Cache errors                          0
-2026-06-23T15:01:24.6804329Z Compilations                          1
-2026-06-23T15:01:24.6804733Z Compilation failures                  1
-2026-06-23T15:01:24.6805190Z Non-cacheable compilations            0
-2026-06-23T15:01:24.6805616Z Non-cacheable calls                   0
-2026-06-23T15:01:24.6806042Z Non-compilation calls                 0
-2026-06-23T15:01:24.6806475Z Unsupported compiler calls            0
-2026-06-23T15:01:24.6806904Z Average cache write               0.035 s
-2026-06-23T15:01:24.6807361Z Average compiler                  6.427 s
-2026-06-23T15:01:24.6807758Z Average cache read hit            0.000 s
-2026-06-23T15:01:24.6808195Z Failed distributed compilations       0
-2026-06-23T15:01:24.6808753Z Cache location                  Local disk: "D:\\a\\zvella\\zvella\\.sccache"
-2026-06-23T15:01:24.6809382Z Use direct/preprocessor mode?   yes
-2026-06-23T15:01:24.6809798Z Version (client)                0.10.0
-2026-06-23T15:01:24.6810226Z Cache size                          558 MiB
-2026-06-23T15:01:24.6810691Z Max cache size                       10 GiB
-2026-06-23T15:01:24.6828919Z ##[endgroup]
-2026-06-23T15:01:24.8395577Z Save cache using key "sccache-win-v1-2026-06-23T15:01:24.836Z".
-2026-06-23T15:01:24.9441043Z [command]"C:\Program Files\Git\usr\bin\tar.exe" --posix -cf cache.tzst --exclude cache.tzst -P -C D:/a/zvella/zvella --files-from manifest.txt --force-local --use-compress-program "zstd -T0"
-2026-06-23T15:01:26.6885722Z (node:9328) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
-2026-06-23T15:01:27.6769032Z Sent 0 of 584346398 (0.0%), 0.0 MBs/sec
-2026-06-23T15:01:28.6814252Z Sent 536870912 of 584346398 (91.9%), 254.6 MBs/sec
-2026-06-23T15:01:28.7250688Z Sent 584346398 of 584346398 (100.0%), 271.2 MBs/sec
-2026-06-23T15:01:28.9236806Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
-2026-06-23T15:01:28.9238193Z Post job cleanup.
-2026-06-23T15:01:29.1579693Z [command]"C:\Program Files\Git\bin\git.exe" version
-2026-06-23T15:01:29.1877967Z git version 2.54.0.windows.1
-2026-06-23T15:01:29.1962034Z Temporarily overriding HOME='D:\a\_temp\67d21971-4790-4b06-b017-02e4cc8feea2' before making global git config changes
-2026-06-23T15:01:29.1963298Z Adding repository directory to the temporary git global config as a safe directory
-2026-06-23T15:01:29.1976443Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\zvella\zvella
-2026-06-23T15:01:29.2323700Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
-2026-06-23T15:01:29.2664935Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
-2026-06-23T15:01:29.8777488Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
-2026-06-23T15:01:29.9085230Z http.https://github.com/.extraheader
-2026-06-23T15:01:29.9138624Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all http.https://github.com/.extraheader
-2026-06-23T15:01:29.9480200Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
-2026-06-23T15:01:30.5303749Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
-2026-06-23T15:01:30.5629509Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
-2026-06-23T15:01:31.1839722Z Cleaning up orphan processes
-2026-06-23T15:01:31.2096012Z Terminate orphan process: pid (5052) (sccache)
-2026-06-23T15:01:31.2209746Z Terminate orphan process: pid (9584) (conhost)
-2026-06-23T15:01:31.2302588Z Terminate orphan process: pid (2836) (vctip)
-2026-06-23T15:01:31.2647687Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/cache@v4, actions/checkout@v4, hendrikmuhs/ccache-action@v1, robinraju/release-downloader@v1.10. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-06-23T15:13:32.1746100Z   enableCrossOsArchive: false
+2026-06-23T15:13:32.1746338Z   fail-on-cache-miss: false
+2026-06-23T15:13:32.1746553Z   lookup-only: false
+2026-06-23T15:13:32.1746753Z   save-always: false
+2026-06-23T15:13:32.1746938Z ##[endgroup]
+2026-06-23T15:13:32.3460117Z (node:6472) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-06-23T15:13:32.3462569Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-06-23T15:13:32.5972670Z Cache hit for: cpm-win-v1-227f179262f5b663f9a7a02af28448a4309a3b3d98695361f4ca2ce2203258c1
+2026-06-23T15:13:32.6096616Z (node:6472) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-06-23T15:13:32.9518015Z Received 5659198 of 5659198 (100.0%), 21.3 MBs/sec
+2026-06-23T15:13:32.9519693Z Cache Size: ~5 MB (5659198 B)
+2026-06-23T15:13:32.9545493Z [command]"C:\Program Files\Git\usr\bin\tar.exe" -xf D:/a/_temp/6b05685b-c324-4a2e-90b2-4dca2e985d4c/cache.tzst -P -C D:/a/zvella/zvella --force-local --use-compress-program "zstd -d"
+2026-06-23T15:13:33.2368561Z Cache restored successfully
+2026-06-23T15:13:33.2491391Z Cache restored from key: cpm-win-v1-227f179262f5b663f9a7a02af28448a4309a3b3d98695361f4ca2ce2203258c1
+2026-06-23T15:13:33.2761361Z ##[group]Run curl -L https://github.com/ninja-build/ninja/releases/latest/download/ninja-win.zip -o ninja.zip
+2026-06-23T15:13:33.2762634Z [36;1mcurl -L https://github.com/ninja-build/ninja/releases/latest/download/ninja-win.zip -o ninja.zip[0m
+2026-06-23T15:13:33.2763558Z [36;1m7z x ninja.zip -o"$GITHUB_WORKSPACE/ninja"[0m
+2026-06-23T15:13:33.2764132Z [36;1mecho "$GITHUB_WORKSPACE/ninja" >> $GITHUB_PATH[0m
+2026-06-23T15:13:33.2781752Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+2026-06-23T15:13:33.2782371Z ##[endgroup]
+2026-06-23T15:13:33.3429227Z   % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+2026-06-23T15:13:33.3430750Z                                  Dload  Upload  Total   Spent   Left   Speed
+2026-06-23T15:13:33.3431172Z 
+2026-06-23T15:13:33.4814711Z   0      0   0      0   0      0      0      0                              0
+2026-06-23T15:13:33.4815401Z   0      0   0      0   0      0      0      0                              0
+2026-06-23T15:13:33.4816215Z   0      0   0      0   0      0      0      0                              0
+2026-06-23T15:13:33.4816864Z 
+2026-06-23T15:13:33.5947922Z   0      0   0      0   0      0      0      0                              0
+2026-06-23T15:13:33.5949024Z   0      0   0      0   0      0      0      0                              0
+2026-06-23T15:13:33.5949510Z   0      0   0      0   0      0      0      0                              0
+2026-06-23T15:13:33.5956158Z 
+2026-06-23T15:13:33.6464963Z   0      0   0      0   0      0      0      0                              0
+2026-06-23T15:13:33.6465635Z 100 284.7k 100 284.7k   0      0 935.2k      0                              0
+2026-06-23T15:13:33.6466682Z 100 284.7k 100 284.7k   0      0 934.8k      0                              0
+2026-06-23T15:13:33.6468308Z 100 284.7k 100 284.7k   0      0 934.2k      0                              0
+2026-06-23T15:13:33.8296746Z 
+2026-06-23T15:13:33.8297441Z 7-Zip 26.01 (x64) : Copyright (c) 1999-2026 Igor Pavlov : 2026-04-27
+2026-06-23T15:13:33.8297888Z 
+2026-06-23T15:13:33.8298024Z Scanning the drive for archives:
+2026-06-23T15:13:33.8298416Z 1 file, 291570 bytes (285 KiB)
+2026-06-23T15:13:33.8298648Z 
+2026-06-23T15:13:33.8298794Z Extracting archive: ninja.zip
+2026-06-23T15:13:33.8710462Z --
+2026-06-23T15:13:33.8710894Z Path = ninja.zip
+2026-06-23T15:13:33.8711226Z Type = zip
+2026-06-23T15:13:33.8711506Z Physical Size = 291570
+2026-06-23T15:13:33.8711738Z 
+2026-06-23T15:13:33.8751855Z Everything is Ok
+2026-06-23T15:13:33.8752092Z 
+2026-06-23T15:13:33.8752203Z Size:       603648
+2026-06-23T15:13:33.8752516Z Compressed: 291570
+2026-06-23T15:13:33.9041456Z ##[group]Run geode-sdk/cli/.github/actions/setup@main
+2026-06-23T15:13:33.9041770Z with:
+2026-06-23T15:13:33.9041957Z   version: latest
+2026-06-23T15:13:33.9042158Z ##[endgroup]
+2026-06-23T15:13:33.9160002Z ##[group]Run if [ "$RUNNER_OS" = "Linux" ]; then
+2026-06-23T15:13:33.9160533Z [36;1mif [ "$RUNNER_OS" = "Linux" ]; then[0m
+2026-06-23T15:13:33.9160837Z [36;1m  echo "host=linux" >> $GITHUB_OUTPUT[0m
+2026-06-23T15:13:33.9161156Z [36;1melif [ "$RUNNER_OS" = "Windows" ]; then[0m
+2026-06-23T15:13:33.9161450Z [36;1m  echo "host=win" >> $GITHUB_OUTPUT[0m
+2026-06-23T15:13:33.9161739Z [36;1melif [ "$RUNNER_OS" = "macOS" ]; then[0m
+2026-06-23T15:13:33.9162022Z [36;1m  echo "host=mac" >> $GITHUB_OUTPUT[0m
+2026-06-23T15:13:33.9162268Z [36;1mfi[0m
+2026-06-23T15:13:33.9172585Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+2026-06-23T15:13:33.9173109Z ##[endgroup]
+2026-06-23T15:13:33.9738924Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-06-23T15:13:33.9740175Z ##[group]Run robinraju/release-downloader@v1.10
+2026-06-23T15:13:33.9740467Z with:
+2026-06-23T15:13:33.9740659Z   repository: geode-sdk/cli
+2026-06-23T15:13:33.9740879Z   latest: true
+2026-06-23T15:13:33.9741074Z   fileName: *-win.zip
+2026-06-23T15:13:33.9741269Z   tarBall: false
+2026-06-23T15:13:33.9741454Z   zipBall: false
+2026-06-23T15:13:33.9741673Z   out-file-path: my-epic-geode-cli
+2026-06-23T15:13:33.9741916Z   preRelease: false
+2026-06-23T15:13:33.9742102Z   extract: false
+2026-06-23T15:13:33.9744836Z   token: ***
+2026-06-23T15:13:33.9745059Z   github-api-url: https://api.github.com
+2026-06-23T15:13:33.9745334Z ##[endgroup]
+2026-06-23T15:13:34.0830741Z Fetching latest release for repo geode-sdk/cli
+2026-06-23T15:13:34.1008128Z (node:9924) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-06-23T15:13:34.1009895Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-06-23T15:13:34.3691924Z Found latest release version: v3.7.4
+2026-06-23T15:13:34.3699389Z Downloading file: geode-cli-v3.7.4-win.zip to: D:\a\zvella\zvella\my-epic-geode-cli
+2026-06-23T15:13:34.6868103Z Done: D:\a\zvella\zvella\my-epic-geode-cli\geode-cli-v3.7.4-win.zip
+2026-06-23T15:13:34.7158059Z ##[group]Run 7z x "my-epic-geode-cli/*-win.zip" -omy-epic-geode-cli
+2026-06-23T15:13:34.7158625Z [36;1m7z x "my-epic-geode-cli/*-win.zip" -omy-epic-geode-cli[0m
+2026-06-23T15:13:34.7159263Z [36;1mchmod +x my-epic-geode-cli/geode[0m
+2026-06-23T15:13:34.7159746Z [36;1mecho "$GITHUB_WORKSPACE/my-epic-geode-cli" >> $GITHUB_PATH[0m
+2026-06-23T15:13:34.7170935Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+2026-06-23T15:13:34.7171340Z ##[endgroup]
+2026-06-23T15:13:34.8196674Z 
+2026-06-23T15:13:34.8199448Z 7-Zip 26.01 (x64) : Copyright (c) 1999-2026 Igor Pavlov : 2026-04-27
+2026-06-23T15:13:34.8199889Z 
+2026-06-23T15:13:34.8199999Z Scanning the drive for archives:
+2026-06-23T15:13:34.8200269Z 1 file, 11925441 bytes (12 MiB)
+2026-06-23T15:13:34.8200427Z 
+2026-06-23T15:13:34.8200617Z Extracting archive: my-epic-geode-cli\geode-cli-v3.7.4-win.zip
+2026-06-23T15:13:35.0612453Z --
+2026-06-23T15:13:35.0613001Z Path = my-epic-geode-cli\geode-cli-v3.7.4-win.zip
+2026-06-23T15:13:35.0613359Z Type = zip
+2026-06-23T15:13:35.0613563Z Physical Size = 11925441
+2026-06-23T15:13:35.0613713Z 
+2026-06-23T15:13:35.0616987Z Everything is Ok
+2026-06-23T15:13:35.0617199Z 
+2026-06-23T15:13:35.0617318Z Size:       32337756
+2026-06-23T15:13:35.0617653Z Compressed: 11925441
+2026-06-23T15:13:35.1080174Z ##[group]Run export CLI_PROFILE="D:\a\zvella\zvella/cli-profile"
+2026-06-23T15:13:35.1080648Z [36;1mexport CLI_PROFILE="D:\a\zvella\zvella/cli-profile"[0m
+2026-06-23T15:13:35.1080984Z [36;1m# for windows[0m
+2026-06-23T15:13:35.1081241Z [36;1mmkdir -p "$CLI_PROFILE/geode/mods"[0m
+2026-06-23T15:13:35.1081717Z [36;1m# for mac[0m
+2026-06-23T15:13:35.1081974Z [36;1mmkdir -p "$CLI_PROFILE/Contents/geode/mods"[0m
+2026-06-23T15:13:35.1082409Z [36;1mgeode profile add --name GithubActions "$CLI_PROFILE/GeometryDash.exe" win[0m
+2026-06-23T15:13:35.1082799Z [36;1m[0m
+2026-06-23T15:13:35.1083096Z [36;1mgeode sdk install "D:\a\zvella\zvella/geode-sdk-clone"[0m
+2026-06-23T15:13:35.1099455Z [36;1m[0m
+2026-06-23T15:13:35.1099857Z [36;1m# silly github actions wont refresh the env[0m
+2026-06-23T15:13:35.1100463Z [36;1mexport GEODE_SDK="D:\a\zvella\zvella/geode-sdk-clone"[0m
+2026-06-23T15:13:35.1101062Z [36;1mecho "GEODE_SDK=$GEODE_SDK" >> $GITHUB_ENV[0m
+2026-06-23T15:13:35.1101515Z [36;1m[0m
+2026-06-23T15:13:35.1101808Z [36;1mif [ "v5.7.1" == "nightly" ]; then[0m
+2026-06-23T15:13:35.1102255Z [36;1m  geode sdk update nightly[0m
+2026-06-23T15:13:35.1102727Z [36;1m  geode sdk install-binaries --platform win[0m
+2026-06-23T15:13:35.1103219Z [36;1melif [ "v5.7.1" == "latest" ]; then[0m
+2026-06-23T15:13:35.1103677Z [36;1m  geode sdk update stable[0m
+2026-06-23T15:13:35.1104131Z [36;1m  geode sdk install-binaries --platform win[0m
+2026-06-23T15:13:35.1104617Z [36;1melif [ "v5.7.1" == "given" ]; then[0m
+2026-06-23T15:13:35.1105481Z [36;1m  export MOD_JSON_PATH=$(find . -name "mod.json" -not -path "./geode-sdk-clone/*" -print | sort -r | head -n 1)[0m
+2026-06-23T15:13:35.1106452Z [36;1m  export TARGET_GEODE_VERSION=$(jq -r '.geode' $MOD_JSON_PATH)[0m
+2026-06-23T15:13:35.1107245Z [36;1m  echo "Updating to version $TARGET_GEODE_VERSION from $MOD_JSON_PATH"[0m
+2026-06-23T15:13:35.1107905Z [36;1m  geode sdk update "$TARGET_GEODE_VERSION"[0m
+2026-06-23T15:13:35.1108610Z [36;1m  geode sdk install-binaries --platform win --version "$TARGET_GEODE_VERSION"[0m
+2026-06-23T15:13:35.1109466Z [36;1melse[0m
+2026-06-23T15:13:35.1109771Z [36;1m  geode sdk update v5.7.1[0m
+2026-06-23T15:13:35.1110232Z [36;1m  geode sdk install-binaries --platform win[0m
+2026-06-23T15:13:35.1110693Z [36;1mfi[0m
+2026-06-23T15:13:35.1110954Z [36;1m[0m
+2026-06-23T15:13:35.1111318Z [36;1mexport CPM_CACHE="D:\a\zvella\zvella/cpm-cache"[0m
+2026-06-23T15:13:35.1111916Z [36;1mecho "CPM_SOURCE_CACHE=$CPM_CACHE" >> $GITHUB_ENV[0m
+2026-06-23T15:13:35.1132847Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+2026-06-23T15:13:35.1134337Z ##[endgroup]
+2026-06-23T15:13:35.2389864Z | Done | A new profile named 'GithubActions' has been created
+2026-06-23T15:13:35.2701070Z | Info | Downloading SDK
+2026-06-23T15:13:35.5649580Z | Info | Enumerating objects: 59063, done.
+2026-06-23T15:13:35.5650155Z | Info | Counting objects:   0% (1/875)
+2026-06-23T15:13:35.5650517Z | Info | Counting objects:   1% (9/875)
+2026-06-23T15:13:35.5651323Z | Info | Counting objects:   2% (18/875)
+2026-06-23T15:13:35.5652070Z | Info | Counting objects:   3% (27/875)
+2026-06-23T15:13:35.5652724Z | Info | Counting objects:   4% (35/875)
+2026-06-23T15:13:35.5653108Z Counting objects:   5% (44/875)
+2026-06-23T15:13:35.5653832Z | Info | Counting objects:   6% (53/875)
+2026-06-23T15:13:35.5654212Z | Info | Counting objects:   7% (62/875)
+2026-06-23T15:13:35.5654560Z | Info | Counting objects:   8% (70/875)
+2026-06-23T15:13:35.5654897Z | Info | Counting objects:   9% (79/875)
+2026-06-23T15:13:35.5655251Z | Info | Counting objects:  10% (88/875)
+2026-06-23T15:13:35.5655605Z | Info | Counting objects:  11% (97/875)
+2026-06-23T15:13:35.5655939Z | Info | Counting objects:  12% (105/875)
+2026-06-23T15:13:35.5656339Z | Info | Counting objects:  13% (114/875)
+2026-06-23T15:13:35.5656626Z | Info | Counting objects:  14% (123/875)
+2026-06-23T15:13:35.5656884Z | Info | Counting objects:  15% (132/875)
+2026-06-23T15:13:35.5657143Z | Info | Counting objects:  16% (140/875)
+2026-06-23T15:13:35.5657391Z | Info | Counting objects:  17% (149/875)
+2026-06-23T15:13:35.5657639Z | Info | Counting objects:  18% (158/875)
+2026-06-23T15:13:35.5657878Z | Info | Counting objects:  19% (167/875)
+2026-06-23T15:13:35.5658414Z | Info | Counting objects:  20% (175/875)
+2026-06-23T15:13:35.5658675Z | Info | Counting objects:  21% (184/875)
+2026-06-23T15:13:35.5658922Z | Info | Counting objects:  22% (193/875)
+2026-06-23T15:13:35.5659170Z Counting objects:  23% (202/875)
+2026-06-23T15:13:35.5659421Z | Info | Counting objects:  24% (210/875)
+2026-06-23T15:13:35.5659670Z | Info | Counting objects:  25% (219/875)
+2026-06-23T15:13:35.5659913Z | Info | Counting objects:  26% (228/875)
+2026-06-23T15:13:35.5660177Z | Info | Counting objects:  27% (237/875)
+2026-06-23T15:13:35.5660434Z | Info | Counting objects:  28% (245/875)
+2026-06-23T15:13:35.5660676Z | Info | Counting objects:  29% (254/875)
+2026-06-23T15:13:35.5660928Z | Info | Counting objects:  30% (263/875)
+2026-06-23T15:13:35.5661172Z | Info | Counting objects:  31% (272/875)
+2026-06-23T15:13:35.5661413Z Counting objects:  32% (280/875)
+2026-06-23T15:13:35.5661649Z | Info | Counting objects:  33% (289/875)
+2026-06-23T15:13:35.5661890Z Counting objects:  34% (298/875)
+2026-06-23T15:13:35.5662122Z | Info | Counting objects:  35% (307/875)
+2026-06-23T15:13:35.5662369Z Counting objects:  36% (315/875)
+2026-06-23T15:13:35.5662596Z | Info | Counting objects:  37% (324/875)
+2026-06-23T15:13:35.5662830Z Counting objects:  38% (333/875)
+2026-06-23T15:13:35.5663063Z | Info | Counting objects:  39% (342/875)
+2026-06-23T15:13:35.5663306Z Counting objects:  40% (350/875)
+2026-06-23T15:13:35.5663544Z | Info | Counting objects:  41% (359/875)
+2026-06-23T15:13:35.5663781Z Counting objects:  42% (368/875)
+2026-06-23T15:13:35.5664009Z | Info | Counting objects:  43% (377/875)
+2026-06-23T15:13:35.5664253Z Counting objects:  44% (385/875)
+2026-06-23T15:13:35.5664472Z | Info | Counting objects:  45% (394/875)
+2026-06-23T15:13:35.5664709Z Counting objects:  46% (403/875)
+2026-06-23T15:13:35.5664936Z | Info | Counting objects:  47% (412/875)
+2026-06-23T15:13:35.5665239Z Counting objects:  48% (420/875)
+2026-06-23T15:13:35.5665470Z | Info | Counting objects:  49% (429/875)
+2026-06-23T15:13:35.5665718Z Counting objects:  50% (438/875)
+2026-06-23T15:13:35.5665967Z | Info | Counting objects:  51% (447/875)
+2026-06-23T15:13:35.5666233Z Counting objects:  52% (455/875)
+2026-06-23T15:13:35.5666465Z | Info | Counting objects:  53% (464/875)
+2026-06-23T15:13:35.5666703Z Counting objects:  54% (473/875)
+2026-06-23T15:13:35.5667128Z | Info | Counting objects:  55% (482/875)
+2026-06-23T15:13:35.5667375Z Counting objects:  56% (490/875)
+2026-06-23T15:13:35.5667607Z | Info | Counting objects:  57% (499/875)
+2026-06-23T15:13:35.5667857Z Counting objects:  58% (508/875)
+2026-06-23T15:13:35.5668077Z | Info | Counting objects:  59% (517/875)
+2026-06-23T15:13:35.5668310Z Counting objects:  60% (525/875)
+2026-06-23T15:13:35.5668540Z | Info | Counting objects:  61% (534/875)
+2026-06-23T15:13:35.5668778Z | Info | Counting objects:  62% (543/875)
+2026-06-23T15:13:35.5669022Z | Info | Counting objects:  63% (552/875)
+2026-06-23T15:13:35.5669337Z | Info | Counting objects:  64% (560/875)
+2026-06-23T15:13:35.5669581Z Counting objects:  65% (569/875)
+2026-06-23T15:13:35.5669811Z | Info | Counting objects:  66% (578/875)
+2026-06-23T15:13:35.5670045Z Counting objects:  67% (587/875)
+2026-06-23T15:13:35.5670265Z | Info | Counting objects:  68% (595/875)
+2026-06-23T15:13:35.5670510Z | Info | Counting objects:  69% (604/875)
+2026-06-23T15:13:35.5670751Z | Info | Counting objects:  70% (613/875)
+2026-06-23T15:13:35.5670990Z | Info | Counting objects:  71% (622/875)
+2026-06-23T15:13:35.5671228Z Counting objects:  72% (630/875)
+2026-06-23T15:13:35.5671448Z | Info | Counting objects:  73% (639/875)
+2026-06-23T15:13:35.5671704Z | Info | Counting objects:  74% (648/875)
+2026-06-23T15:13:35.5671952Z | Info | Counting objects:  75% (657/875)
+2026-06-23T15:13:35.5672191Z | Info | Counting objects:  76% (665/875)
+2026-06-23T15:13:35.5672432Z Counting objects:  77% (674/875)
+2026-06-23T15:13:35.5672656Z | Info | Counting objects:  78% (683/875)
+2026-06-23T15:13:35.5672887Z Counting objects:  79% (692/875)
+2026-06-23T15:13:35.5674418Z | Info | Counting objects:  80% (700/875)
+2026-06-23T15:13:35.5674676Z Counting objects:  81% (709/875)
+2026-06-23T15:13:35.5674914Z | Info | Counting objects:  82% (718/875)
+2026-06-23T15:13:35.5675163Z | Info | Counting objects:  83% (727/875)
+2026-06-23T15:13:35.5675398Z Counting objects:  84% (735/875)
+2026-06-23T15:13:35.5675629Z | Info | Counting objects:  85% (744/875)
+2026-06-23T15:13:35.5675879Z Counting objects:  86% (753/875)
+2026-06-23T15:13:35.5676104Z | Info | Counting objects:  87% (762/875)
+2026-06-23T15:13:35.5676340Z Counting objects:  88% (770/875)
+2026-06-23T15:13:35.5676571Z | Info | Counting objects:  89% (779/875)
+2026-06-23T15:13:35.5676802Z Counting objects:  90% (788/875)
+2026-06-23T15:13:35.5677022Z | Info | Counting objects:  91% (797/875)
+2026-06-23T15:13:35.5677263Z Counting objects:  92% (805/875)
+2026-06-23T15:13:35.5677478Z Counting objects:  93% (814/875)
+2026-06-23T15:13:35.5677693Z | Info | Counting objects:  94% (823/875)
+2026-06-23T15:13:35.5677945Z | Info | Counting objects:  95% (832/875)
+2026-06-23T15:13:35.5678185Z | Info | Counting objects:  96% (840/875)
+2026-06-23T15:13:35.5678425Z | Info | Counting objects:  97% (849/875)
+2026-06-23T15:13:35.5678668Z Counting objects:  98% (858/875)
+2026-06-23T15:13:35.5678882Z Counting objects:  99% (867/875)
+2026-06-23T15:13:35.5679105Z | Info | Counting objects: 100% (875/875)
+2026-06-23T15:13:35.5679368Z | Info | Counting objects: 100% (875/875), done.
+2026-06-23T15:13:35.5679683Z | Info | Compressing objects:   0% (1/292)
+2026-06-23T15:13:35.5679958Z Compressing objects:   1% (3/292)
+2026-06-23T15:13:35.5680202Z | Info | Compressing objects:   2% (6/292)
+2026-06-23T15:13:35.5680446Z | Info | Compressing objects:   3% (9/292)
+2026-06-23T15:13:35.5680708Z | Info | Compressing objects:   4% (12/292)
+2026-06-23T15:13:35.5680973Z | Info | Compressing objects:   5% (15/292)
+2026-06-23T15:13:35.5681236Z | Info | Compressing objects:   6% (18/292)
+2026-06-23T15:13:35.5681492Z | Info | Compressing objects:   7% (21/292)
+2026-06-23T15:13:35.5681745Z | Info | Compressing objects:   8% (24/292)
+2026-06-23T15:13:35.5682009Z | Info | Compressing objects:   9% (27/292)
+2026-06-23T15:13:35.5682266Z | Info | Compressing objects:  10% (30/292)
+2026-06-23T15:13:35.5682513Z | Info | Compressing objects:  11% (33/292)
+2026-06-23T15:13:35.5682960Z | Info | Compressing objects:  12% (36/292)
+2026-06-23T15:13:35.5683213Z | Info | Compressing objects:  13% (38/292)
+2026-06-23T15:13:35.5683461Z | Info | Compressing objects:  14% (41/292)
+2026-06-23T15:13:35.5683718Z | Info | Compressing objects:  15% (44/292)
+2026-06-23T15:13:35.5683970Z | Info | Compressing objects:  16% (47/292)
+2026-06-23T15:13:35.5684223Z | Info | Compressing objects:  17% (50/292)
+2026-06-23T15:13:35.5684479Z | Info | Compressing objects:  18% (53/292)
+2026-06-23T15:13:35.5684729Z | Info | Compressing objects:  19% (56/292)
+2026-06-23T15:13:35.5684978Z | Info | Compressing objects:  20% (59/292)
+2026-06-23T15:13:35.5685236Z | Info | Compressing objects:  21% (62/292)
+2026-06-23T15:13:35.5685482Z | Info | Compressing objects:  22% (65/292)
+2026-06-23T15:13:35.5685730Z | Info | Compressing objects:  23% (68/292)
+2026-06-23T15:13:35.5685981Z | Info | Compressing objects:  24% (71/292)
+2026-06-23T15:13:35.5686226Z | Info | Compressing objects:  25% (73/292)
+2026-06-23T15:13:35.5686484Z | Info | Compressing objects:  26% (76/292)
+2026-06-23T15:13:35.5686729Z | Info | Compressing objects:  27% (79/292)
+2026-06-23T15:13:35.5686976Z | Info | Compressing objects:  28% (82/292)
+2026-06-23T15:13:35.5687274Z | Info | Compressing objects:  29% (85/292)
+2026-06-23T15:13:35.5687524Z | Info | Compressing objects:  30% (88/292)
+2026-06-23T15:13:35.5687771Z | Info | Compressing objects:  31% (91/292)
+2026-06-23T15:13:35.5688025Z | Info | Compressing objects:  32% (94/292)
+2026-06-23T15:13:35.5688311Z | Info | Compressing objects:  33% (97/292)
+2026-06-23T15:13:35.5688724Z | Info | Compressing objects:  34% (100/292)
+2026-06-23T15:13:35.5689168Z | Info | Compressing objects:  35% (103/292)
+2026-06-23T15:13:35.5689439Z | Info | Compressing objects:  36% (106/292)
+2026-06-23T15:13:35.5689699Z | Info | Compressing objects:  37% (109/292)
+2026-06-23T15:13:35.5689962Z | Info | Compressing objects:  38% (111/292)
+2026-06-23T15:13:35.5690221Z | Info | Compressing objects:  39% (114/292)
+2026-06-23T15:13:35.5690476Z | Info | Compressing objects:  40% (117/292)
+2026-06-23T15:13:35.5690740Z | Info | Compressing objects:  41% (120/292)
+2026-06-23T15:13:35.5691043Z | Info | Compressing objects:  42% (123/292)
+2026-06-23T15:13:35.5691311Z | Info | Compressing objects:  43% (126/292)
+2026-06-23T15:13:35.5691593Z | Info | Compressing objects:  44% (129/292)
+2026-06-23T15:13:35.5691848Z | Info | Compressing objects:  45% (132/292)
+2026-06-23T15:13:35.5692106Z | Info | Compressing objects:  46% (135/292)
+2026-06-23T15:13:35.5692359Z | Info | Compressing objects:  47% (138/292)
+2026-06-23T15:13:35.5692613Z | Info | Compressing objects:  48% (141/292)
+2026-06-23T15:13:35.5692881Z | Info | Compressing objects:  49% (144/292)
+2026-06-23T15:13:35.5693136Z | Info | Compressing objects:  50% (146/292)
+2026-06-23T15:13:35.5693384Z | Info | Compressing objects:  51% (149/292)
+2026-06-23T15:13:35.5693644Z | Info | Compressing objects:  52% (152/292)
+2026-06-23T15:13:35.5694218Z | Info | Compressing objects:  53% (155/292)
+2026-06-23T15:13:35.5694477Z | Info | Compressing objects:  54% (158/292)
+2026-06-23T15:13:35.5694738Z | Info | Compressing objects:  55% (161/292)
+2026-06-23T15:13:35.5694991Z | Info | Compressing objects:  56% (164/292)
+2026-06-23T15:13:35.5695239Z | Info | Compressing objects:  57% (167/292)
+2026-06-23T15:13:35.5695499Z | Info | Compressing objects:  58% (170/292)
+2026-06-23T15:13:35.5695748Z | Info | Compressing objects:  59% (173/292)
+2026-06-23T15:13:35.5696006Z | Info | Compressing objects:  60% (176/292)
+2026-06-23T15:13:35.5696260Z | Info | Compressing objects:  61% (179/292)
+2026-06-23T15:13:35.5696517Z | Info | Compressing objects:  62% (182/292)
+2026-06-23T15:13:35.5696777Z | Info | Compressing objects:  63% (184/292)
+2026-06-23T15:13:35.5697032Z | Info | Compressing objects:  64% (187/292)
+2026-06-23T15:13:35.5697284Z | Info | Compressing objects:  65% (190/292)
+2026-06-23T15:13:35.5697545Z | Info | Compressing objects:  66% (193/292)
+2026-06-23T15:13:35.5697967Z | Info | Compressing objects:  67% (196/292)
+2026-06-23T15:13:35.5698228Z | Info | Compressing objects:  68% (199/292)
+2026-06-23T15:13:35.5698487Z | Info | Compressing objects:  69% (202/292)
+2026-06-23T15:13:35.5698742Z | Info | Compressing objects:  70% (205/292)
+2026-06-23T15:13:35.5698993Z | Info | Compressing objects:  71% (208/292)
+2026-06-23T15:13:35.5699258Z | Info | Compressing objects:  72% (211/292)
+2026-06-23T15:13:35.5699510Z | Info | Compressing objects:  73% (214/292)
+2026-06-23T15:13:35.5699761Z | Info | Compressing objects:  74% (217/292)
+2026-06-23T15:13:35.5700017Z | Info | Compressing objects:  75% (219/292)
+2026-06-23T15:13:35.5700276Z | Info | Compressing objects:  76% (222/292)
+2026-06-23T15:13:35.5700525Z | Info | Compressing objects:  77% (225/292)
+2026-06-23T15:13:35.5700785Z | Info | Compressing objects:  78% (228/292)
+2026-06-23T15:13:35.5701033Z | Info | Compressing objects:  79% (231/292)
+2026-06-23T15:13:35.5701289Z | Info | Compressing objects:  80% (234/292)
+2026-06-23T15:13:35.5701552Z | Info | Compressing objects:  81% (237/292)
+2026-06-23T15:13:35.5701986Z | Info | Compressing objects:  82% (240/292)
+2026-06-23T15:13:35.5702446Z | Info | Compressing objects:  83% (243/292)
+2026-06-23T15:13:35.5702897Z | Info | Compressing objects:  84% (246/292)
+2026-06-23T15:13:35.5703199Z | Info | Compressing objects:  85% (249/292)
+2026-06-23T15:13:35.5703455Z | Info | Compressing objects:  86% (252/292)
+2026-06-23T15:13:35.5703717Z | Info | Compressing objects:  87% (255/292)
+2026-06-23T15:13:35.5703966Z | Info | Compressing objects:  88% (257/292)
+2026-06-23T15:13:35.5704227Z | Info | Compressing objects:  89% (260/292)
+2026-06-23T15:13:35.5704632Z | Info | Compressing objects:  90% (263/292)
+2026-06-23T15:13:35.5704888Z | Info | Compressing objects:  91% (266/292)
+2026-06-23T15:13:35.5705150Z | Info | Compressing objects:  92% (269/292)
+2026-06-23T15:13:35.5705400Z | Info | Compressing objects:  93% (272/292)
+2026-06-23T15:13:35.5705751Z | Info | Compressing objects:  94% (275/292)
+2026-06-23T15:13:35.5706189Z | Info | Compressing objects:  95% (278/292)
+2026-06-23T15:13:35.5706514Z | Info | Compressing objects:  96% (281/292)
+2026-06-23T15:13:35.5706774Z | Info | Compressing objects:  97% (284/292)
+2026-06-23T15:13:35.5707031Z | Info | Compressing objects:  98% (287/292)
+2026-06-23T15:13:35.5707283Z | Info | Compressing objects:  99% (290/292)
+2026-06-23T15:13:35.5707542Z | Info | Compressing objects: 100% (292/292)
+2026-06-23T15:13:35.5707823Z | Info | Compressing objects: 100% (292/292), done.
+2026-06-23T15:13:45.4855443Z | Info | Total 59063 (delta 755), reused 608 (delta 583), pack-reused 58188 (from 3)
+2026-06-23T15:13:50.1594193Z | Info | Set GEODE_SDK environment variable automatically
+2026-06-23T15:13:50.2109161Z | Info | Updating head
+2026-06-23T15:13:50.2727415Z | Done | Updated head to v5.7.1
+2026-06-23T15:13:50.2727894Z | Done | Successfully installed SDK
+2026-06-23T15:13:50.2728594Z | Info | Please restart your command line to have the GEODE_SDK enviroment variable set.
+2026-06-23T15:13:50.2729157Z | Info | Use `geode sdk install-binaries` to install pre-built binaries
+2026-06-23T15:13:50.3077494Z | Info | Switching to v5.7.1
+2026-06-23T15:13:50.3077931Z | Info | Updating SDK
+2026-06-23T15:13:50.4376337Z | Info | Updating head
+2026-06-23T15:13:50.5117178Z | Info | Switched to v5.7.1
+2026-06-23T15:13:50.5117640Z | Done | Successfully updated SDK.
+2026-06-23T15:13:50.5431529Z | Info | Installing binaries for 5.7.1
+2026-06-23T15:13:50.7577397Z | Info | Found binaries for platform Windows
+2026-06-23T15:13:50.7579964Z | Info | Downloading
+2026-06-23T15:13:51.4177538Z | Done | Binaries installed
+2026-06-23T15:13:51.4409591Z ##[group]Run mkdir -p $HOME/.cache
+2026-06-23T15:13:51.4409935Z [36;1mmkdir -p $HOME/.cache[0m
+2026-06-23T15:13:51.4410173Z [36;1m[0m
+2026-06-23T15:13:51.4410397Z [36;1mNDK_PATH="/usr/local/lib/android/sdk/ndk/"[0m
+2026-06-23T15:13:51.4410689Z [36;1mif [ "" = "" ]; then[0m
+2026-06-23T15:13:51.4411780Z [36;1m  NDK_PATH="$ANDROID_NDK_LATEST_HOME"[0m
+2026-06-23T15:13:51.4412071Z [36;1mfi[0m
+2026-06-23T15:13:51.4412243Z [36;1m[0m
+2026-06-23T15:13:51.4412418Z [36;1mcd "./"[0m
+2026-06-23T15:13:51.4412621Z [36;1mCMAKE_EXTRA_ARGS=""[0m
+2026-06-23T15:13:51.4412859Z [36;1mif [ win = "mac" ]; then[0m
+2026-06-23T15:13:51.4413507Z [36;1m  CMAKE_EXTRA_ARGS="-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DGEODE_DISABLE_PRECOMPILED_HEADERS=OFF -DCMAKE_AR='/usr/bin/ar' -DCMAKE_RANLIB='/usr/bin/ranlib'"[0m
+2026-06-23T15:13:51.4414604Z [36;1melif [ win = "android32" ]; then[0m
+2026-06-23T15:13:51.4415366Z [36;1m  CMAKE_EXTRA_ARGS="-DCMAKE_TOOLCHAIN_FILE=$NDK_PATH/build/cmake/android.toolchain.cmake -DANDROID_STL=c++_shared -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-23"[0m
+2026-06-23T15:13:51.4416089Z [36;1melif [ win = "android64" ]; then[0m
+2026-06-23T15:13:51.4416768Z [36;1m  CMAKE_EXTRA_ARGS="-DCMAKE_TOOLCHAIN_FILE=$NDK_PATH/build/cmake/android.toolchain.cmake -DANDROID_STL=c++_shared -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-23"[0m
+2026-06-23T15:13:51.4417452Z [36;1melif [ win = "ios" ]; then[0m
+2026-06-23T15:13:51.4417950Z [36;1m  CMAKE_EXTRA_ARGS="-DCMAKE_SYSTEM_NAME=iOS -DGEODE_TARGET_PLATFORM=iOS -DGEODE_DISABLE_PRECOMPILED_HEADERS=OFF"[0m
+2026-06-23T15:13:51.4418472Z [36;1mfi[0m
+2026-06-23T15:13:51.4418655Z [36;1mif [ "true" = "true" ]; then[0m
+2026-06-23T15:13:51.4419048Z [36;1m  CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON"[0m
+2026-06-23T15:13:51.4419431Z [36;1mfi[0m
+2026-06-23T15:13:51.4419657Z [36;1mif [ "false" = "true" ] && [ win = "win" ]; then[0m
+2026-06-23T15:13:51.4420215Z [36;1m  CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DGEODE_BUNDLE_PDB=ON"[0m
+2026-06-23T15:13:51.4420538Z [36;1mfi[0m
+2026-06-23T15:13:51.4420718Z [36;1mif [ -n "sccache" ]; then[0m
+2026-06-23T15:13:51.4420978Z [36;1m  CCACHE_PATH="$(which "sccache")"[0m
+2026-06-23T15:13:51.4421541Z [36;1m  CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DCMAKE_C_COMPILER_LAUNCHER=${CCACHE_PATH} -DCMAKE_CXX_COMPILER_LAUNCHER=${CCACHE_PATH}"[0m
+2026-06-23T15:13:51.4422070Z [36;1mfi[0m
+2026-06-23T15:13:51.4423020Z [36;1mcmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DGEODE_CODEGEN_CMAKE_ARGS="-DCMAKE_C_COMPILER=clang;-DCMAKE_CXX_COMPILER=clang++;-G Ninja" -G Ninja $CMAKE_EXTRA_ARGS -DGEODE_DONT_INSTALL_MODS=ON -DGEODE_TARGET_PLATFORM=Win64 [0m
+2026-06-23T15:13:51.4424092Z [36;1mcmake --build build --config Release  --parallel[0m
+2026-06-23T15:13:51.4424393Z [36;1m[0m
+2026-06-23T15:13:51.4424593Z [36;1mmkdir "D:\a\zvella\zvella/output"[0m
+2026-06-23T15:13:51.4424856Z [36;1m[0m
+2026-06-23T15:13:51.4425074Z [36;1mfor file in $(find ./build -name *.geode); do[0m
+2026-06-23T15:13:51.4425390Z [36;1m  cp $file "D:\a\zvella\zvella/output"[0m
+2026-06-23T15:13:51.4425718Z [36;1m  if [ win = "linux" ] && [ "false" = "true" ]; then[0m
+2026-06-23T15:13:51.4426075Z [36;1m    if [ win = "android32" ] || [ win = "android64" ]; then[0m
+2026-06-23T15:13:51.4426431Z [36;1m      SO_FILE_NAME="$(basename $file .geode).win.so"[0m
+2026-06-23T15:13:51.4426754Z [36;1m      if [ -f "./build/$SO_FILE_NAME" ]; then[0m
+2026-06-23T15:13:51.4427180Z [36;1m        dump_syms ./build/$SO_FILE_NAME -o "D:\a\zvella\zvella/output/$SO_FILE_NAME.sym"[0m
+2026-06-23T15:13:51.4427578Z [36;1m      fi[0m
+2026-06-23T15:13:51.4427759Z [36;1m    fi[0m
+2026-06-23T15:13:51.4427932Z [36;1m  fi[0m
+2026-06-23T15:13:51.4428111Z [36;1mdone[0m
+2026-06-23T15:13:51.4428279Z [36;1m[0m
+2026-06-23T15:13:51.4428455Z [36;1mif [ win = "win" ]; then[0m
+2026-06-23T15:13:51.4428706Z [36;1m  if [ "false" = "true" ]; then[0m
+2026-06-23T15:13:51.4429003Z [36;1m    for file in $(find ./build -name *.pdb); do[0m
+2026-06-23T15:13:51.4429328Z [36;1m      cp $file "D:\a\zvella\zvella/output"[0m
+2026-06-23T15:13:51.4429596Z [36;1m    done[0m
+2026-06-23T15:13:51.4429776Z [36;1m  fi[0m
+2026-06-23T15:13:51.4430047Z [36;1mfi[0m
+2026-06-23T15:13:51.4430222Z [36;1m[0m
+2026-06-23T15:13:51.4430494Z [36;1mif [ "false" = "true" ]; then[0m
+2026-06-23T15:13:51.4430897Z [36;1m  for file in $(find ./build -name *.pdb); do[0m
+2026-06-23T15:13:51.4431353Z [36;1m    cp $file "D:\a\zvella\zvella/output"[0m
+2026-06-23T15:13:51.4431727Z [36;1m  done[0m
+2026-06-23T15:13:51.4432317Z [36;1m  for file in $(find ./build -name *.dbg); do[0m
+2026-06-23T15:13:51.4432758Z [36;1m    cp $file "D:\a\zvella\zvella/output"[0m
+2026-06-23T15:13:51.4433170Z [36;1m  done[0m
+2026-06-23T15:13:51.4433500Z [36;1m  for dir in $(find ./build -name *.dSYM); do[0m
+2026-06-23T15:13:51.4434003Z [36;1m    cp -R $dir "D:\a\zvella\zvella/output"[0m
+2026-06-23T15:13:51.4434414Z [36;1m  done[0m
+2026-06-23T15:13:51.4434671Z [36;1mfi[0m
+2026-06-23T15:13:51.4434912Z [36;1m[0m
+2026-06-23T15:13:51.4435199Z [36;1mOUTPUT_DIR="D:\a\zvella\zvella/output"[0m
+2026-06-23T15:13:51.4435638Z [36;1mif [ win = "mac" ]; then[0m
+2026-06-23T15:13:51.4436320Z [36;1m  OUTPUT_DIR=$(python3 -c 'import os, sys; print(os.path.realpath(sys.argv[1]))' "$OUTPUT_DIR")[0m
+2026-06-23T15:13:51.4437041Z [36;1melif [ win = "win" ]; then[0m
+2026-06-23T15:13:51.4437469Z [36;1m  OUTPUT_DIR=$(cygpath -wa "$OUTPUT_DIR")[0m
+2026-06-23T15:13:51.4437896Z [36;1melse[0m
+2026-06-23T15:13:51.4438211Z [36;1m  OUTPUT_DIR=$(realpath "$OUTPUT_DIR")[0m
+2026-06-23T15:13:51.4438629Z [36;1mfi[0m
+2026-06-23T15:13:51.4438933Z [36;1mecho "output=$OUTPUT_DIR" >> $GITHUB_OUTPUT[0m
+2026-06-23T15:13:51.4450365Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+2026-06-23T15:13:51.4450918Z env:
+2026-06-23T15:13:51.4451141Z   GEODE_SDK: D:\a\zvella\zvella/geode-sdk-clone
+2026-06-23T15:13:51.4451468Z   CPM_SOURCE_CACHE: D:\a\zvella\zvella/cpm-cache
+2026-06-23T15:13:51.4451745Z ##[endgroup]
+2026-06-23T15:14:12.2144350Z -- The CXX compiler identification is Clang 20.1.8 with GNU-like command-line
+2026-06-23T15:14:19.2613688Z -- The C compiler identification is Clang 20.1.8 with GNU-like command-line
+2026-06-23T15:14:19.3849441Z -- Detecting CXX compiler ABI info
+2026-06-23T15:14:22.8641581Z -- Detecting CXX compiler ABI info - done
+2026-06-23T15:14:22.9270616Z -- Check for working CXX compiler: C:/Program Files/LLVM/bin/clang++.exe - skipped
+2026-06-23T15:14:22.9286591Z -- Detecting CXX compile features
+2026-06-23T15:14:23.4977665Z -- Detecting CXX compile features - done
+2026-06-23T15:14:23.5142117Z -- Detecting C compiler ABI info
+2026-06-23T15:14:25.2801379Z -- Detecting C compiler ABI info - done
+2026-06-23T15:14:25.3313225Z -- Check for working C compiler: C:/Program Files/LLVM/bin/clang.exe - skipped
+2026-06-23T15:14:25.3319345Z -- Detecting C compile features
+2026-06-23T15:14:25.3329024Z -- Detecting C compile features - done
+2026-06-23T15:14:25.3901447Z CMake Warning (dev) at C:/Program Files/CMake/share/cmake-4.3/Modules/FetchContent.cmake:1966 (message):
+2026-06-23T15:14:25.3902491Z   Calling FetchContent_Populate(spout2) is deprecated, call
+2026-06-23T15:14:25.3903246Z   FetchContent_MakeAvailable(spout2) instead.  Policy CMP0169 can be set to
+2026-06-23T15:14:25.3904050Z   OLD to allow FetchContent_Populate(spout2) to be called directly for now,
+2026-06-23T15:14:25.3904841Z   but the ability to call it with declared details will be removed completely
+2026-06-23T15:14:25.3905825Z   in a future version.
+2026-06-23T15:14:25.3906194Z Call Stack (most recent call first):
+2026-06-23T15:14:25.3906631Z   CMakeLists.txt:40 (FetchContent_Populate)
+2026-06-23T15:14:25.3907253Z This warning is for project developers.  Use -Wno-dev to suppress it.
+2026-06-23T15:14:25.3907727Z 
+2026-06-23T15:14:54.3111605Z -- GitHub Actions build detected
+2026-06-23T15:14:54.3112036Z -- Found Geode: D:\a\zvella\zvella/geode-sdk-clone
+2026-06-23T15:14:54.3135296Z -- Version: 5.7.1
+2026-06-23T15:14:54.3252415Z -- No override path for bindings provided, using CPM to clone default. If you would like to use a separate clone of the bindings repo (for example in order to be able to efficiently change and contribute new bindings) then set GEODE_BINDINGS_REPO_PATH to where you have cloned the repository (system environment variables are supported).
+2026-06-23T15:14:54.3255668Z -- CPM: Adding package bindings@ (main)
+2026-06-23T15:14:54.3271487Z -- Populating bindings
+2026-06-23T15:14:54.4055782Z -- Configuring done (0.0s)
+2026-06-23T15:14:54.4302125Z -- Generating done (0.0s)
+2026-06-23T15:14:54.4313461Z -- Build files have been written to: D:/a/zvella/zvella/build/_deps/bindings-subbuild
+2026-06-23T15:14:54.5252119Z [1/9] Creating directories for 'bindings-populate'
+2026-06-23T15:14:54.5255080Z [1/9] Performing download step (git clone) for 'bindings-populate'
+2026-06-23T15:14:54.5943329Z Cloning into 'bindings-src'...
+2026-06-23T15:15:03.0374407Z Already on 'main'
+2026-06-23T15:15:03.0401065Z Your branch is up to date with 'origin/main'.
+2026-06-23T15:15:03.6538220Z [2/9] Performing update step for 'bindings-populate'
+2026-06-23T15:15:03.7133878Z -- Fetching latest from the remote origin
+2026-06-23T15:15:04.8345430Z [3/9] No patch step for 'bindings-populate'
+2026-06-23T15:15:04.9260797Z [5/9] No configure step for 'bindings-populate'
+2026-06-23T15:15:04.9711616Z [6/9] No build step for 'bindings-populate'
+2026-06-23T15:15:05.0144316Z [7/9] No install step for 'bindings-populate'
+2026-06-23T15:15:05.0582749Z [8/9] No test step for 'bindings-populate'
+2026-06-23T15:15:05.1192620Z [9/9] Completed 'bindings-populate'
+2026-06-23T15:15:05.1264670Z -- Looking for ccache/sccache
+2026-06-23T15:15:05.1265313Z -- Looking for ccache/sccache - detecting variant
+2026-06-23T15:15:05.1266383Z -- Looking for ccache/sccache - detected sccache
+2026-06-23T15:15:05.1266908Z Using sccache with Clang, PCH will be enabled.
+2026-06-23T15:15:05.1267346Z -- Pre-compiled headers - ON
+2026-06-23T15:15:05.1429874Z -- Found Geode CLI: D:/a/zvella/zvella/my-epic-geode-cli/geode.exe (version 3.7.4)
+2026-06-23T15:15:05.1463544Z -- Found Git: C:/Program Files/Git/mingw64/bin/git.exe (found version "2.54.0.windows.1")
+2026-06-23T15:15:05.1903658Z -- CPM: Adding package result@1.4.1 (v1.4.1 at D:/a/zvella/zvella/cpm-cache/result/1b9c)
+2026-06-23T15:15:05.2407163Z -- CPM: Adding package json@3.3.0 (v3.3.0 at D:/a/zvella/zvella/cpm-cache/json/75ca)
+2026-06-23T15:15:05.4406439Z -- CPM: Adding package nontype_functional@6 (6d1d08c at D:/a/zvella/zvella/cpm-cache/nontype_functional/aaa0)
+2026-06-23T15:15:05.5523838Z -- {fmt} version: 12.1.0
+2026-06-23T15:15:05.5524294Z -- Build type: Release
+2026-06-23T15:15:05.5722488Z -- Performing Test HAS_NULLPTR_WARNING
+2026-06-23T15:15:09.6683516Z -- Performing Test HAS_NULLPTR_WARNING - Success
+2026-06-23T15:15:09.6705215Z -- CPM: Adding package fmt@12.1.0 (12.1.0 at D:/a/zvella/zvella/cpm-cache/fmt/6226)
+2026-06-23T15:15:09.7391793Z -- CPM: Adding package asp2@51 (51d3773 at D:/a/zvella/zvella/cpm-cache/asp2/4dd3)
+2026-06-23T15:15:09.7970020Z -- Arc features: time
+2026-06-23T15:15:09.7981876Z -- CPM: Adding package arc@1.5.5 (v1.5.5 at D:/a/zvella/zvella/cpm-cache/arc/70cb)
+2026-06-23T15:15:09.8614539Z -- CPM: Adding package TulipHook@3.1.11 (v3.1.11 at D:/a/zvella/zvella/cpm-cache/tuliphook/37c6)
+2026-06-23T15:15:09.8627606Z -- Performing Test SUPPORTS_W_NO_EVERYTHING
+2026-06-23T15:15:10.1526571Z -- Performing Test SUPPORTS_W_NO_EVERYTHING - Success
+2026-06-23T15:15:10.1545571Z -- Downloading Codegen
+2026-06-23T15:15:10.1546176Z Set SKIP_BUILDING_CODEGEN to OFF to force codegen to build locally.
+2026-06-23T15:15:10.4231632Z -- Downloading Codegen - success
+2026-06-23T15:15:10.4232108Z -- Skipping building Codegen
+2026-06-23T15:15:10.4232510Z -- Running Codegen
+2026-06-23T15:15:11.6422382Z './Codegen' 'Win64' 'D:/a/zvella/zvella/build/_deps/bindings-src/bindings/2.2081' 'D:/a/zvella/zvella/build/bindings/bindings'
+2026-06-23T15:15:11.6423745Z -- Setting up LayoutOBSBypass
+2026-06-23T15:15:11.6517696Z -- Mod layoutmode.obs-bypass is compiling for Geode version 5.7.1
+2026-06-23T15:15:11.6518803Z -- Mod layoutmode.obs-bypass is compiling for Geometry Dash version 2.2081
+2026-06-23T15:15:11.6711422Z -- Skipping installing LayoutOBSBypass
+2026-06-23T15:15:11.6721709Z -- Configuring done (72.9s)
+2026-06-23T15:15:12.0042849Z -- Generating done (0.3s)
+2026-06-23T15:15:12.0057930Z -- Build files have been written to: D:/a/zvella/zvella/build
+2026-06-23T15:15:12.0692414Z [0/2] Re-checking globbed directories...
+2026-06-23T15:15:27.3510179Z [1/42] Building CXX object _deps/fmt-build/CMakeFiles/fmt.dir/src/format.cc.obj
+2026-06-23T15:15:27.3527677Z In file included from D:/a/zvella/zvella/cpm-cache/fmt/6226/src/format.cc:8:
+2026-06-23T15:15:27.3529275Z In file included from D:/a/zvella/zvella/cpm-cache/fmt/6226/include\fmt/format-inl.h:23:
+2026-06-23T15:15:27.3707754Z In file included from D:/a/zvella/zvella/cpm-cache/fmt/6226/include\fmt\format.h:41:
+2026-06-23T15:15:27.3711017Z D:/a/zvella/zvella/cpm-cache/fmt/6226/include\fmt\base.h:930:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+2026-06-23T15:15:27.3712853Z   930 |     isalpha('x', loc);
+2026-06-23T15:15:27.3713639Z       |     ^~~~~~~ ~~~~~~~~
+2026-06-23T15:15:27.3721868Z D:/a/zvella/zvella/cpm-cache/fmt/6226/src/format.cc:13:30: note: in instantiation of function template specialization 'fmt::locale_ref::locale_ref<std::locale, 0>' requested here
+2026-06-23T15:15:27.3723996Z    13 | template FMT_API locale_ref::locale_ref(const std::locale& loc);  // DEPRECATED!
+2026-06-23T15:15:27.3724424Z       |                              ^
+2026-06-23T15:15:27.3724677Z 1 warning generated.
+2026-06-23T15:15:27.4239464Z [2/42] Building CXX object _deps/fmt-build/CMakeFiles/fmt.dir/src/os.cc.obj
+2026-06-23T15:15:27.5289490Z [3/42] Linking CXX static library _deps\fmt-build\fmt.lib
+2026-06-23T15:15:28.4608424Z [4/42] Building CXX object _deps/asp2-build/CMakeFiles/asp.dir/Unity/unity_0_cxx.cxx.obj
+2026-06-23T15:15:28.5428841Z [5/42] Building CXX object _deps/arc-build/CMakeFiles/arc.dir/Unity/unity_0_cxx.cxx.obj
+2026-06-23T15:15:28.5906840Z [6/42] Linking CXX static library _deps\asp2-build\asp.lib
+2026-06-23T15:15:28.7375250Z [7/42] Linking CXX static library _deps\arc-build\arc.lib
+2026-06-23T15:15:28.8848968Z [8/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutCopy.cpp.obj
+2026-06-23T15:15:29.2404824Z [9/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/Spout.cpp.obj
+2026-06-23T15:15:29.2589377Z D:/a/zvella/zvella/build/_deps/spout2-src/SPOUTSDK/SpoutGL/Spout.cpp:1919:31: warning: address of array 'driverversion' will always evaluate to 'true' [-Wpointer-bool-conversion]
+2026-06-23T15:15:29.2830861Z  1919 |                         if (!driverdescription || !driverversion) {
+2026-06-23T15:15:29.3256518Z       |                                                   ~^~~~~~~~~~~~~
+2026-06-23T15:15:29.3603717Z D:/a/zvella/zvella/build/_deps/spout2-src/SPOUTSDK/SpoutGL/Spout.cpp:1919:9: warning: address of array 'driverdescription' will always evaluate to 'true' [-Wpointer-bool-conversion]
+2026-06-23T15:15:29.4053763Z  1919 |                         if (!driverdescription || !driverversion) {
+2026-06-23T15:15:29.4354364Z       |                             ~^~~~~~~~~~~~~~~~~
+2026-06-23T15:15:29.4740324Z 2 warnings generated.
+2026-06-23T15:15:29.6580132Z [10/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutDirectX.cpp.obj
+2026-06-23T15:15:29.6928450Z [11/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutFrameCount.cpp.obj
+2026-06-23T15:15:30.1468253Z [12/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutGL.cpp.obj
+2026-06-23T15:15:30.1807651Z D:/a/zvella/zvella/build/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutGL.cpp:798:8: warning: comparison of different enumeration types in switch statement ('DXGI_FORMAT' and '_D3DFORMAT') [-Wenum-compare-switch]
+2026-06-23T15:15:30.2157814Z   795 |         switch (d3dformat) {
+2026-06-23T15:15:30.2427398Z       |                 ~~~~~~~~~
+2026-06-23T15:15:30.2594158Z   796 |                 // DirectX 9
+2026-06-23T15:15:30.2945840Z   797 |                 case D3DFMT_A8R8G8B8:
+2026-06-23T15:15:30.3053840Z   798 |                 case D3DFMT_X8R8G8B8:
+2026-06-23T15:15:30.3371697Z       |                      ^~~~~~~~~~~~~~~
+2026-06-23T15:15:30.3621135Z D:/a/zvella/zvella/build/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutGL.cpp:797:8: warning: comparison of different enumeration types in switch statement ('DXGI_FORMAT' and '_D3DFORMAT') [-Wenum-compare-switch]
+2026-06-23T15:15:30.3798934Z   795 |         switch (d3dformat) {
+2026-06-23T15:15:30.4071347Z       |                 ~~~~~~~~~
+2026-06-23T15:15:30.4299386Z   796 |                 // DirectX 9
+2026-06-23T15:15:30.4478525Z   797 |                 case D3DFMT_A8R8G8B8:
+2026-06-23T15:15:30.4683572Z       |                      ^~~~~~~~~~~~~~~
+2026-06-23T15:15:30.4904177Z 2 warnings generated.
+2026-06-23T15:15:30.7154953Z [13/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutGLextensions.cpp.obj
+2026-06-23T15:15:30.9530307Z [14/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutSenderNames.cpp.obj
+2026-06-23T15:15:30.9720450Z [15/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutSender.cpp.obj
+2026-06-23T15:15:31.0173665Z [16/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutSharedMemory.cpp.obj
+2026-06-23T15:15:31.2478262Z [17/42] Running Codegen
+2026-06-23T15:15:31.2989064Z [18/42] Building CXX object CMakeFiles/SpoutGL_static.dir/_deps/spout2-src/SPOUTSDK/SpoutGL/SpoutUtils.cpp.obj
+2026-06-23T15:15:32.8627327Z [19/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_14_cxx.cxx.obj
+2026-06-23T15:15:32.8894591Z [20/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_13_cxx.cxx.obj
+2026-06-23T15:15:32.9809684Z [21/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_11_cxx.cxx.obj
+2026-06-23T15:15:34.4672581Z [22/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_10_cxx.cxx.obj
+2026-06-23T15:15:34.4901573Z [23/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_12_cxx.cxx.obj
+2026-06-23T15:15:34.6838595Z [24/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_8_cxx.cxx.obj
+2026-06-23T15:15:36.1854748Z [25/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_9_cxx.cxx.obj
+2026-06-23T15:15:36.2694230Z [26/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_7_cxx.cxx.obj
+2026-06-23T15:15:36.4652469Z [27/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_6_cxx.cxx.obj
+2026-06-23T15:15:37.9202356Z [28/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_5_cxx.cxx.obj
+2026-06-23T15:15:37.9683587Z [29/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_4_cxx.cxx.obj
+2026-06-23T15:15:38.3011380Z [30/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_3_cxx.cxx.obj
+2026-06-23T15:15:39.6704521Z [31/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_2_cxx.cxx.obj
+2026-06-23T15:15:39.6892864Z [32/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_1_cxx.cxx.obj
+2026-06-23T15:15:39.7707346Z [33/42] Linking CXX static library SpoutGL_static.lib
+2026-06-23T15:15:40.0091822Z [34/42] Building CXX object bindings/CMakeFiles/GeodeBindings.dir/Unity/unity_0_cxx.cxx.obj
+2026-06-23T15:15:40.5106896Z [35/42] Building CXX object CMakeFiles/LayoutOBSBypass.dir/src/SpoutWrapper.cpp.obj
+2026-06-23T15:15:40.5809192Z [36/42] Linking CXX static library bindings\GeodeBindings.lib
+2026-06-23T15:15:50.6349532Z [37/42] Building CXX object CMakeFiles/LayoutOBSBypass.dir/cmake_pch.hxx.pch
+2026-06-23T15:15:51.7368049Z [38/42] Building CXX object CMakeFiles/LayoutOBSBypass.dir/geode-sdk-clone/entry.cpp.obj
+2026-06-23T15:15:54.4085400Z [39/42] Building CXX object CMakeFiles/LayoutOBSBypass.dir/src/main.cpp.obj
+2026-06-23T15:15:54.4086045Z FAILED: [code=1] CMakeFiles/LayoutOBSBypass.dir/src/main.cpp.obj 
+2026-06-23T15:15:54.4092489Z C:\Users\runneradmin\.cargo\bin\sccache C:\PROGRA~1\LLVM\bin\CLANG_~1.EXE -DARC_FEATURE_TIME=1 -DGEODE_COMP_GD_VERSION=22081 -DGEODE_GD_VERSION=2.2081 -DGEODE_GD_VERSION_STRING=\"2.2081\" -DGEODE_MOD_ID=\"layoutmode.obs-bypass\" -DLayoutOBSBypass_EXPORTS -DMAT_JSON_DYNAMIC=1 -DNOMINMAX -DPROJECT_NAME=LayoutOBSBypass -D_HAS_ITERATOR_DEBUGGING=0 -ID:/a/zvella/zvella/src -ID:/a/zvella/zvella/build/_deps/spout2-src/SPOUTSDK/SpoutGL -ID:/a/zvella/zvella/geode-sdk-clone/loader/include -ID:/a/zvella/zvella/geode-sdk-clone/loader/include/Geode/cocos/include -ID:/a/zvella/zvella/geode-sdk-clone/loader/include/Geode/cocos/extensions -ID:/a/zvella/zvella/geode-sdk-clone/loader/include/Geode/fmod -isystem D:/a/zvella/zvella/build/bindings/bindings -isystem D:/a/zvella/zvella/build/_deps/bindings-src/bindings/include -isystem D:/a/zvella/zvella/cpm-cache/fmt/6226/include -isystem D:/a/zvella/zvella/cpm-cache/tuliphook/37c6/include -isystem D:/a/zvella/zvella/cpm-cache/result/1b9c/include -isystem D:/a/zvella/zvella/cpm-cache/json/75ca/include -isystem D:/a/zvella/zvella/cpm-cache/nontype_functional/aaa0/include -isystem D:/a/zvella/zvella/cpm-cache/asp2/4dd3/include -isystem D:/a/zvella/zvella/cpm-cache/arc/70cb/include -O3 -DNDEBUG -std=gnu++23 -D_DLL -D_MT -Xclang --dependent-lib=msvcrt -flto=thin --target=x86_64-pc-windows-msvc -Werror=return-type -Xclang -include-pch -Xclang D:/a/zvella/zvella/build/CMakeFiles/LayoutOBSBypass.dir/cmake_pch.hxx.pch -Xclang -include -Xclang D:/a/zvella/zvella/build/CMakeFiles/LayoutOBSBypass.dir/cmake_pch.hxx -MD -MT CMakeFiles/LayoutOBSBypass.dir/src/main.cpp.obj -MF CMakeFiles\LayoutOBSBypass.dir\src\main.cpp.obj.d -o CMakeFiles/LayoutOBSBypass.dir/src/main.cpp.obj -c D:/a/zvella/zvella/src/main.cpp
+2026-06-23T15:15:54.4101490Z In file included from D:/a/zvella/zvella/src/main.cpp:5:
+2026-06-23T15:15:54.4103153Z D:/a/zvella/zvella/build/bindings/bindings\Geode/modify/PauseLayer.hpp:276:4: error: static assertion failed due to requirement '!different': Function PauseLayer::init cannot be hooked due to an inline definition existing for the function.
+2026-06-23T15:15:54.4104854Z   276 |                         GEODE_APPLY_MODIFY_FOR_FUNCTION_ERROR_INLINE(PauseLayer, init, bool)
+2026-06-23T15:15:54.4105951Z       |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2026-06-23T15:15:54.4107108Z D:\a\zvella\zvella\geode-sdk-clone\loader\include\Geode\modify\Modify.hpp:77:23: note: expanded from macro 'GEODE_APPLY_MODIFY_FOR_FUNCTION_ERROR_INLINE'
+2026-06-23T15:15:54.4108424Z    77 |         static_assert(!different,                                                                             \
+2026-06-23T15:15:54.4109105Z       |                       ^~~~~~~~~~
+2026-06-23T15:15:54.4110497Z D:\a\zvella\zvella\geode-sdk-clone\loader\include\Geode\modify\Modify.hpp:457:61: note: in instantiation of member function 'geode::modifier::ModifyDerive<DualPauseLayer, PauseLayer>::apply' requested here
+2026-06-23T15:15:54.4111949Z   457 |         static inline modifier::ModifyDerive<Derived, Base> s_apply;
+2026-06-23T15:15:54.4112548Z       |                                                             ^
+2026-06-23T15:15:54.4113786Z D:\a\zvella\zvella\geode-sdk-clone\loader\include\Geode\modify\Modify.hpp:459:50: note: in instantiation of static data member 'geode::Modify<DualPauseLayer, PauseLayer>::s_apply' requested here
+2026-06-23T15:15:54.4115133Z   459 |         static inline auto s_applyRef = &Modify::s_apply;
+2026-06-23T15:15:54.4115658Z       |                                                  ^
+2026-06-23T15:15:54.4116043Z 1 error generated.
+2026-06-23T15:15:54.4116355Z ninja: build stopped: subcommand failed.
+2026-06-23T15:15:54.4203755Z ##[error]Process completed with exit code 1.
+2026-06-23T15:15:54.4576670Z Post job cleanup.
+2026-06-23T15:15:54.4710515Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-06-23T15:15:54.4711662Z Post job cleanup.
+2026-06-23T15:15:54.5985255Z (node:1324) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-06-23T15:15:54.5986011Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-06-23T15:15:54.7148385Z ##[group]sccache stats
+2026-06-23T15:15:54.7877588Z [command]C:\Users\runneradmin\.cargo\bin\sccache.exe -s
+2026-06-23T15:15:54.8048501Z Compile requests                     33
+2026-06-23T15:15:54.8049257Z Compile requests executed            33
+2026-06-23T15:15:54.8049758Z Cache hits                           31
+2026-06-23T15:15:54.8050032Z Cache hits (C/C++)                   31
+2026-06-23T15:15:54.8050273Z Cache misses                          1
+2026-06-23T15:15:54.8050527Z Cache misses (C/C++)                  1
+2026-06-23T15:15:54.8050775Z Cache hits rate                   96.88 %
+2026-06-23T15:15:54.8051038Z Cache hits rate (C/C++)           96.88 %
+2026-06-23T15:15:54.8051317Z Cache timeouts                        0
+2026-06-23T15:15:54.8051572Z Cache read errors                     0
+2026-06-23T15:15:54.8051824Z Forced recaches                       0
+2026-06-23T15:15:54.8052089Z Cache write errors                    0
+2026-06-23T15:15:54.8052638Z Cache errors                          0
+2026-06-23T15:15:54.8052884Z Compilations                          1
+2026-06-23T15:15:54.8053123Z Compilation failures                  1
+2026-06-23T15:15:54.8053372Z Non-cacheable compilations            0
+2026-06-23T15:15:54.8053725Z Non-cacheable calls                   0
+2026-06-23T15:15:54.8054067Z Non-compilation calls                 0
+2026-06-23T15:15:54.8054327Z Unsupported compiler calls            0
+2026-06-23T15:15:54.8054600Z Average cache write               0.035 s
+2026-06-23T15:15:54.8054880Z Average compiler                  6.335 s
+2026-06-23T15:15:54.8055135Z Average cache read hit            0.001 s
+2026-06-23T15:15:54.8055405Z Failed distributed compilations       0
+2026-06-23T15:15:54.8055750Z Cache location                  Local disk: "D:\\a\\zvella\\zvella\\.sccache"
+2026-06-23T15:15:54.8056164Z Use direct/preprocessor mode?   yes
+2026-06-23T15:15:54.8056444Z Version (client)                0.10.0
+2026-06-23T15:15:54.8056716Z Cache size                          597 MiB
+2026-06-23T15:15:54.8056977Z Max cache size                       10 GiB
+2026-06-23T15:15:54.8074155Z ##[endgroup]
+2026-06-23T15:15:54.9140087Z Save cache using key "sccache-win-v1-2026-06-23T15:15:54.912Z".
+2026-06-23T15:15:54.9803139Z [command]"C:\Program Files\Git\usr\bin\tar.exe" --posix -cf cache.tzst --exclude cache.tzst -P -C D:/a/zvella/zvella --files-from manifest.txt --force-local --use-compress-program "zstd -T0"
+2026-06-23T15:15:56.5113711Z (node:1324) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-06-23T15:15:57.5019679Z Sent 0 of 625646374 (0.0%), 0.0 MBs/sec
+2026-06-23T15:15:58.5025907Z Sent 558537510 of 625646374 (89.3%), 265.4 MBs/sec
+2026-06-23T15:15:58.8690445Z Sent 625646374 of 625646374 (100.0%), 251.3 MBs/sec
+2026-06-23T15:15:59.1793807Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-06-23T15:15:59.1795153Z Post job cleanup.
+2026-06-23T15:15:59.3445677Z [command]"C:\Program Files\Git\bin\git.exe" version
+2026-06-23T15:15:59.3710400Z git version 2.54.0.windows.1
+2026-06-23T15:15:59.3776379Z Temporarily overriding HOME='D:\a\_temp\5ed8f6f3-0d31-43ad-bcad-d91d7d8b9beb' before making global git config changes
+2026-06-23T15:15:59.3777567Z Adding repository directory to the temporary git global config as a safe directory
+2026-06-23T15:15:59.3786521Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\zvella\zvella
+2026-06-23T15:15:59.4094541Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2026-06-23T15:15:59.4395427Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2026-06-23T15:16:00.0028229Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-06-23T15:16:00.0326938Z http.https://github.com/.extraheader
+2026-06-23T15:16:00.0373586Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all http.https://github.com/.extraheader
+2026-06-23T15:16:00.0698845Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2026-06-23T15:16:00.6258039Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-06-23T15:16:00.6550408Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-06-23T15:16:01.2044658Z Cleaning up orphan processes
+2026-06-23T15:16:01.2289278Z Terminate orphan process: pid (9564) (sccache)
+2026-06-23T15:16:01.2398146Z Terminate orphan process: pid (7428) (conhost)
+2026-06-23T15:16:01.2503611Z Terminate orphan process: pid (6528) (vctip)
+2026-06-23T15:16:01.2519141Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/cache@v4, actions/checkout@v4, hendrikmuhs/ccache-action@v1, robinraju/release-downloader@v1.10. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
