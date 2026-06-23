@@ -1,229 +1,237 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayLayer.hpp>
-#include <Geode/modify/GameObject.hpp>
 #include <Geode/modify/CCDirector.hpp>
 
 #include "DualRender.hpp"
 #include "LayoutConfig.hpp"
-#include "SpoutWrapper.hpp"   // Spout calls live in SpoutWrapper.cpp (no Geode/GLEW)
+#include "SpoutWrapper.hpp"
 
 using namespace geode::prelude;
 
-// ============================================================
-// Layout color theme (hardcoded blue, matches EclipseMenu defaults)
-// ============================================================
-static constexpr cocos2d::ccColor3B LAYOUT_BG    = { 40, 125, 255 };
-static constexpr cocos2d::ccColor3B LAYOUT_GROUND= {  0, 102, 255 };
-static constexpr cocos2d::ccColor3B LAYOUT_LINE  = {255, 255, 255 };
-static constexpr cocos2d::ccColor3B LAYOUT_MG    = { 40, 125, 255 };
+// Layout mode color theme
+static constexpr cocos2d::ccColor3B LAYOUT_BG    = { 40, 125, 255};
+static constexpr cocos2d::ccColor3B LAYOUT_GROUND= {  0, 102, 255};
+static constexpr cocos2d::ccColor3B LAYOUT_MG    = { 40, 125, 255};
 
 // ============================================================
-// Dual render lifecycle helpers (wrap SpoutWrapper with Geode state + logging)
+// DecoCache — cache decoration objects at addObject time,
+// toggle visibility per frame. Works with batch rendering
+// because setVisible(false) is respected by CCSpriteBatchNode.
 // ============================================================
-namespace DualRenderLifecycle {
-    static std::string senderName() {
-        return Mod::get()->getSettingValue<std::string>("spout-name");
-    }
+namespace DecoCache {
+    static std::vector<GameObject*> g_objects;
 
-    static bool init(int w, int h) {
-        std::string name = senderName();
-        bool ok = SpoutWrapper::init(w, h, name);
+    void clear() { g_objects.clear(); }
 
-        DualRender::s_width  = w;
-        DualRender::s_height = h;
-        DualRender::s_spoutInitialized = ok;
-
-        if (ok) log::info("Spout sender '{}' created ({}x{})", name, w, h);
-        else    log::error("Failed to create Spout sender '{}'", name);
-        return ok;
-    }
-
-    static void sendRT() {
-        if (!DualRender::s_rt) return;
-        SpoutWrapper::sendTexture(
-            DualRender::s_rt->getSprite()->getTexture()->getName(),
-            DualRender::s_width, DualRender::s_height, true);
-    }
-
-    static void release() {
-        SpoutWrapper::release();
-        if (DualRender::s_rt) {
-            DualRender::s_rt->release();
-            DualRender::s_rt = nullptr;
+    void tryAdd(GameObject* obj) {
+        if (LayoutConfig::isDecoration(obj->m_objectID, obj->m_objectType)) {
+            g_objects.push_back(obj);
         }
-        DualRender::s_spoutInitialized = false;
-        log::info("Spout sender released");
     }
 
-    static void resize(int w, int h) {
-        if (w == DualRender::s_width && h == DualRender::s_height) return;
-        release();
-        init(w, h);
+    void hide() {
+        for (auto* o : g_objects) o->setVisible(false);
+    }
+
+    void show() {
+        for (auto* o : g_objects) o->setVisible(true);
     }
 }
 
 // ============================================================
-// Render-time color override (fixes Bug #1).
-// `updateColor` is called by game logic (triggers / level start), NOT by the
-// render loop, so checking s_isLayoutPass there had no effect. Instead we
-// recolor BG / Ground right before the layout pass is drawn and restore
-// immediately after, so the clean OBS pass is unaffected.
+// LayoutLook — temporarily recolor BG / Ground / MG nodes
 // ============================================================
 namespace LayoutLook {
-    struct Saved {
-        cocos2d::CCNodeRGBA* node;
-        cocos2d::ccColor3B color;
-    };
+    struct Saved { cocos2d::CCNodeRGBA* node; cocos2d::ccColor3B color; };
     static std::vector<Saved> g_saved;
 
-    static void recolorOne(cocos2d::CCNode* node, cocos2d::ccColor3B c) {
-        if (!node) return;
-        // Only CCNodeRGBA subclasses (CCSprite, CCLayerRGBA, ...) have setColor.
-        auto* rgba = dynamic_cast<cocos2d::CCNodeRGBA*>(node);
-        if (!rgba) return;
-        g_saved.push_back({ rgba, rgba->getColor() });
-        rgba->setColor(c);
+    static void paint(cocos2d::CCNode* n, cocos2d::ccColor3B c) {
+        if (!n) return;
+        if (auto* rgba = dynamic_cast<cocos2d::CCNodeRGBA*>(n)) {
+            g_saved.push_back({rgba, rgba->getColor()});
+            rgba->setColor(c);
+        }
+    }
+
+    static void paintChildren(cocos2d::CCNode* parent, cocos2d::ccColor3B c) {
+        if (!parent || !parent->getChildren()) return;
+        auto* ch = parent->getChildren();
+        for (unsigned i = 0; i < ch->count(); ++i)
+            paint(static_cast<cocos2d::CCNode*>(ch->objectAtIndex(i)), c);
     }
 
     static void apply(PlayLayer* pl) {
         g_saved.clear();
         if (!pl) return;
-        recolorOne(pl->m_background,  LAYOUT_BG);
-        recolorOne(pl->m_groundLayer, LAYOUT_GROUND);
-        if (pl->m_groundLayer && pl->m_groundLayer->getChildren()) {
-            for (size_t i = 0; i < pl->m_groundLayer->getChildrenCount(); ++i) {
-                recolorOne(static_cast<cocos2d::CCNode*>(
-                    pl->m_groundLayer->getChildren()->objectAtIndex(i)), LAYOUT_GROUND);
-            }
-        }
+        paint(pl->m_background, LAYOUT_BG);
+        paint(pl->m_groundLayer, LAYOUT_GROUND);
+        paintChildren(pl->m_groundLayer, LAYOUT_GROUND);
+        paint(pl->m_groundLayer2, LAYOUT_GROUND);
+        paintChildren(pl->m_groundLayer2, LAYOUT_GROUND);
+        paint(pl->m_middleground, LAYOUT_MG);
+        paintChildren(pl->m_middleground, LAYOUT_MG);
     }
 
     static void restore() {
-        for (auto& s : g_saved) {
-            if (s.node) s.node->setColor(s.color);
-        }
+        for (auto& s : g_saved) if (s.node) s.node->setColor(s.color);
         g_saved.clear();
     }
 }
 
 // ============================================================
-// Hook: GameObject::visit — filter decorations + blue-tint the rest
-// (Non-destructive: object state is restored after the call.)
+// Spout lifecycle
 // ============================================================
-class $modify(LayoutGameObject, GameObject) {
-    void visit() {
-        if (!(DualRender::s_active && DualRender::s_isLayoutPass)) {
-            GameObject::visit();
-            return;
-        }
-
-        // Skip decorations entirely
-        if (LayoutConfig::isDecoration(m_objectID, m_objectType)) {
-            return;
-        }
-
-        const bool hadGlow = !m_hasNoGlow;
-        m_hasNoGlow = true;
-
-        const cocos2d::ccColor3B prevColor = getColor();
-        setColor(LAYOUT_MG);
-        GameObject::visit();
-        setColor(prevColor);
-
-        m_hasNoGlow = !hadGlow;
+namespace SpoutLife {
+    static std::string name() {
+        return Mod::get()->getSettingValue<std::string>("spout-name");
     }
-};
+
+    static bool start(int w, int h) {
+        auto n = name();
+        bool ok = SpoutWrapper::init(w, h, n);
+        DualRender::s_width  = w;
+        DualRender::s_height = h;
+        DualRender::s_spoutInitialized = ok;
+        if (ok) log::info("Spout '{}' ready ({}x{})", n, w, h);
+        else    log::error("Spout '{}' FAILED", n);
+        return ok;
+    }
+
+    static void send() {
+        if (!DualRender::s_rt || !DualRender::s_spoutInitialized) return;
+        SpoutWrapper::sendTexture(
+            DualRender::s_rt->getSprite()->getTexture()->getName(),
+            DualRender::s_width, DualRender::s_height, true);
+    }
+
+    static void stop() {
+        SpoutWrapper::release();
+        if (DualRender::s_rt) { DualRender::s_rt->release(); DualRender::s_rt = nullptr; }
+        DualRender::s_spoutInitialized = false;
+    }
+}
 
 // ============================================================
-// Hook: PlayLayer — manage dual render lifecycle
+// PlayLayer — lifecycle + cache decorations in addObject
 // ============================================================
-class $modify(DualRenderPlayLayer, PlayLayer) {
+class $modify(DualPlayLayer, PlayLayer) {
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
+        DecoCache::clear();
+
+        // PlayLayer::init() calls addObject() for every object in the level.
+        // Our hooked addObject below caches decorations during this process.
         if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
 
         if (Mod::get()->getSettingValue<bool>("enabled")) {
-            const auto win = CCDirector::sharedDirector()->getWinSizeInPixels();
-            const int w = static_cast<int>(win.width);
-            const int h = static_cast<int>(win.height);
+            auto ws = cocos2d::CCDirector::sharedDirector()->getWinSizeInPixels();
+            int w = static_cast<int>(ws.width);
+            int h = static_cast<int>(ws.height);
 
-            // Offscreen target for the clean OBS pass — CCRenderTexture handles
-            // depth/stencil + projection correctly (fixes Bugs #2 and #4).
-            DualRender::s_rt = CCRenderTexture::create(w, h, kCCTexture2DPixelFormat_RGBA8888);
-            DualRender::s_rt->retain();
+            DualRender::s_rt = cocos2d::CCRenderTexture::create(
+                w, h, cocos2d::kCCTexture2DPixelFormat_RGBA8888);
+            if (DualRender::s_rt) DualRender::s_rt->retain();
 
-            DualRenderLifecycle::init(w, h);
+            SpoutLife::start(w, h);
             DualRender::s_active = true;
-            log::info("Dual render activated for level: {}", level->m_levelName);
+
+            log::info("Dual render ON — {} decorations cached", DecoCache::g_objects.size());
         }
         return true;
     }
 
+    // Called for EVERY object added to the level (during init and gameplay).
+    // We always cache — the cache is only USED when s_active is true.
+    void addObject(GameObject* obj) {
+        PlayLayer::addObject(obj);
+        DecoCache::tryAdd(obj);
+    }
+
     void onQuit() {
         DualRender::s_active = false;
-        DualRenderLifecycle::release();
+        DecoCache::clear();
+        SpoutLife::stop();
         PlayLayer::onQuit();
+    }
+
+    // Also handle resetLevel (practice mode respawn etc.)
+    void resetLevel() {
+        // Ensure all objects are visible before reset
+        if (DualRender::s_active) DecoCache::show();
+        PlayLayer::resetLevel();
     }
 };
 
 // ============================================================
-// Hook: CCDirector::drawScene — the dual render core
-//   Pass 1 (clean  → OBS) : render scene into CCRenderTexture, send via Spout
-//   Pass 2 (layout → screen) : normal cocos drawScene with layout overrides
-// HUD/labels are CCNodes, not GameObjects, so they appear in both passes.
+// CCDirector::drawScene — dual render core
+//
+// Pass 1 (Clean → OBS):  All objects VISIBLE, normal colors
+//                         → render to CCRenderTexture → send via Spout
+// Pass 2 (Layout → Screen): Decorations HIDDEN, BG/Ground recolored
+//                         → render to default framebuffer (screen)
+//
+// HUD elements (CPS, labels etc.) are CCNodes not GameObjects,
+// so they're untouched and visible in both passes.
 // ============================================================
-class $modify(DualRenderDirector, CCDirector) {
+class $modify(DualDirector, cocos2d::CCDirector) {
     void drawScene() {
         if (!DualRender::s_active) {
-            CCDirector::drawScene();
+            cocos2d::CCDirector::drawScene();
             return;
         }
 
         auto* scene = getRunningScene();
-        auto* pl = PlayLayer::get();
+        auto* pl    = PlayLayer::get();
+        auto* rt    = DualRender::s_rt;
 
-        // Spout not ready / no offscreen target — still do layout on screen.
-        if (!DualRender::s_spoutInitialized || !DualRender::s_rt || !scene) {
-            DualRender::s_isLayoutPass = true;
+        // No RT or Spout failed → still show layout on screen
+        if (!scene || !rt || !DualRender::s_spoutInitialized) {
+            DecoCache::hide();
             LayoutLook::apply(pl);
-            CCDirector::drawScene();
+            cocos2d::CCDirector::drawScene();
             LayoutLook::restore();
-            DualRender::s_isLayoutPass = false;
+            DecoCache::show();
             return;
         }
 
         // Handle window resize
-        const auto win = getWinSizeInPixels();
-        const int w = static_cast<int>(win.width);
-        const int h = static_cast<int>(win.height);
+        auto ws = getWinSizeInPixels();
+        int w = static_cast<int>(ws.width);
+        int h = static_cast<int>(ws.height);
         if (w != DualRender::s_width || h != DualRender::s_height) {
-            DualRenderLifecycle::resize(w, h);
-            if (!DualRender::s_rt) {
-                DualRender::s_rt = CCRenderTexture::create(w, h, kCCTexture2DPixelFormat_RGBA8888);
-                DualRender::s_rt->retain();
-            }
+            SpoutLife::stop();
+            SpoutLife::start(w, h);
+            DualRender::s_rt = cocos2d::CCRenderTexture::create(
+                w, h, cocos2d::kCCTexture2DPixelFormat_RGBA8888);
+            if (DualRender::s_rt) DualRender::s_rt->retain();
+            rt = DualRender::s_rt;
+            if (!rt) { cocos2d::CCDirector::drawScene(); return; }
         }
 
-        // --- PASS 1: CLEAN → offscreen texture → Spout (OBS) ---
+        // ─── PASS 1: Clean render → texture → Spout (for OBS) ───
+        // All decorations visible, original colors — normal gameplay.
         DualRender::s_isLayoutPass = false;
-        DualRender::s_rt->beginWithClear(0.f, 0.f, 0.f, 1.f, 1.f, 0);
+        rt->beginWithClear(0.f, 0.f, 0.f, 1.f, 1.f, 0);
         scene->visit();
-        DualRender::s_rt->end();
+        rt->end();
+        SpoutLife::send();
 
-        DualRenderLifecycle::sendRT();
-
-        // --- PASS 2: LAYOUT → default framebuffer (screen) ---
+        // ─── PASS 2: Layout mode → screen (for player) ───
+        // Hide decorations, recolor BG/Ground, then render.
         DualRender::s_isLayoutPass = true;
+        DecoCache::hide();
         LayoutLook::apply(pl);
-        CCDirector::drawScene();
+
+        cocos2d::CCDirector::drawScene();
+
         LayoutLook::restore();
+        DecoCache::show();
         DualRender::s_isLayoutPass = false;
     }
 };
 
 // ============================================================
-// Geode mod entry
-// ============================================================
 $on_mod(Loaded) {
-    log::info("Layout Mode OBS Bypass loaded!");
-    log::info("Use Spout2 Capture in OBS with the sender name from settings.");
+    log::info("Layout Mode OBS Bypass v1.0 loaded!");
+    log::info("IMPORTANT: Disable Eclipse's Layout Mode! This mod handles it.");
+    log::info("In OBS: Add 'Spout2 Capture' → select sender from mod settings.");
 }
