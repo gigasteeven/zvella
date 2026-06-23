@@ -50,7 +50,7 @@ namespace LayoutFastSwapper {
             if (!isImportant) {
                 g_decorations.push_back(obj);
             }
-        } else if (XDBot::solidObjectIDs.contains(id) && obj->m_scale <= 0.f) {
+        } else if (XDBot::solidObjectIDs.contains(id) && obj->getScale() <= 0.f) {
             g_decorations.push_back(obj);
         }
     }
