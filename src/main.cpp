@@ -122,38 +122,53 @@ namespace LayoutLayerManager {
         s_isCached = true;
     }
 
-    void tryAdd(GameObject* obj, PlayLayer* pl) {
-        if (!obj || !pl) return;
+    void splitBatchNodes(PlayLayer* pl) {
+        if (!pl || !pl->m_objectLayer) return;
         initBatchNodes(pl);
 
-        int id = obj->m_objectID;
-        
-        bool isDeco = XDBot::decoObjectIDs.contains(id) || obj->m_objectType == GameObjectType::Decoration;
-        bool isImportantDeco = false;
-        if (isDeco && obj->m_groups) {
-            for (int i = 0; i < obj->m_groupCount; ++i) {
-                if (XDBot::LayoutMode::s_importantGroups.contains(obj->m_groups->at(i))) {
-                    isImportantDeco = true;
-                    break;
+        for (auto& entry : g_decoBatches) {
+            auto* batch = entry.node;
+            auto* newBatch = g_batchMap[batch];
+            if (!batch || !newBatch) continue;
+
+            auto* children = batch->getChildren();
+            if (!children) continue;
+
+            std::vector<GameObject*> toMove;
+            for (int i = 0; i < children->count(); ++i) {
+                if (auto* obj = typeinfo_cast<GameObject*>(children->objectAtIndex(i))) {
+                    int id = obj->m_objectID;
+
+                    bool isDeco = XDBot::decoObjectIDs.contains(id) || obj->m_objectType == GameObjectType::Decoration;
+                    bool isImportantDeco = false;
+                    if (isDeco && obj->m_groups) {
+                        for (int g = 0; g < obj->m_groupCount; ++g) {
+                            if (XDBot::LayoutMode::s_importantGroups.contains(obj->m_groups->at(g))) {
+                                isImportantDeco = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    bool isHiddenSolid = (XDBot::solidObjectIDs.contains(id) && obj->getScale() <= 0.f);
+
+                    bool shouldShowInLayout = true;
+                    if (isDeco && !isImportantDeco) {
+                        shouldShowInLayout = false; // Pure decoration -> stay in original batch node
+                    } else if (isHiddenSolid) {
+                        shouldShowInLayout = false; // Hidden solid -> stay in original batch node
+                    }
+
+                    if (shouldShowInLayout) {
+                        toMove.push_back(obj);
+                    }
                 }
             }
-        }
 
-        bool isHiddenSolid = (XDBot::solidObjectIDs.contains(id) && obj->getScale() <= 0.f);
-
-        bool shouldShowInLayout = true;
-        if (isDeco && !isImportantDeco) {
-            shouldShowInLayout = false; // Pure decoration -> stay in deco batch (hidden in layout)
-        } else if (isHiddenSolid) {
-            shouldShowInLayout = false; // Hidden solid -> stay in deco batch (hidden in layout)
-        }
-
-        if (shouldShowInLayout) {
-            auto parentBatch = typeinfo_cast<cocos2d::CCSpriteBatchNode*>(obj->getParent());
-            if (parentBatch && g_batchMap.contains(parentBatch)) {
+            for (auto* obj : toMove) {
                 obj->retain();
                 obj->removeFromParentAndCleanup(false);
-                g_batchMap[parentBatch]->addChild(obj);
+                newBatch->addChild(obj, obj->getZOrder(), obj->getTag());
                 obj->release();
             }
         }
@@ -330,13 +345,11 @@ class $modify(PlayLayer) {
         DualRender::s_active = true;
         LayoutLayerManager::clear();
         bool ret = PlayLayer::init(level, useReplay, dontCreateObjects);
-        LayoutLook::initCache(this);
+        if (ret) {
+            LayoutLayerManager::splitBatchNodes(this);
+            LayoutLook::initCache(this);
+        }
         return ret;
-    }
-
-    void addObject(GameObject* obj) {
-        PlayLayer::addObject(obj);
-        LayoutLayerManager::tryAdd(obj, this);
     }
 
     void onQuit() {
@@ -358,14 +371,46 @@ class $modify(PlayLayer) {
 // ============================================================
 class $modify(DualDirector, cocos2d::CCDirector) {
     void drawScene() {
-        if (!DualRender::s_active) {
+        bool enabled = Mod::get()->getSettingValue<bool>("enabled");
+        if (!enabled) {
+            if (DualRender::s_active) {
+                SpoutLife::stop();
+                DualRender::s_active = false;
+            }
             cocos2d::CCDirector::drawScene();
             return;
+        }
+
+        if (!DualRender::s_active) {
+            auto ws = getWinSizeInPixels();
+            int w = static_cast<int>(ws.width);
+            int h = static_cast<int>(ws.height);
+
+            DualRender::s_rt = cocos2d::CCRenderTexture::create(
+                w, h, cocos2d::kCCTexture2DPixelFormat_RGBA8888, GL_DEPTH24_STENCIL8);
+            if (DualRender::s_rt) DualRender::s_rt->retain();
+
+            SpoutLife::start(w, h);
+            DualRender::s_active = true;
+            initLayoutShader();
         }
 
         auto* scene = getRunningScene();
         auto* pl    = DualRender::s_inPlayLayer ? PlayLayer::get() : nullptr;
         auto* rt    = DualRender::s_rt;
+
+        auto ws = getWinSizeInPixels();
+        int w = static_cast<int>(ws.width);
+        int h = static_cast<int>(ws.height);
+
+        if (w != DualRender::s_width || h != DualRender::s_height) {
+            SpoutLife::stop();
+            SpoutLife::start(w, h);
+            DualRender::s_rt = cocos2d::CCRenderTexture::create(w, h, cocos2d::kCCTexture2DPixelFormat_RGBA8888, GL_DEPTH24_STENCIL8);
+            if (DualRender::s_rt) DualRender::s_rt->retain();
+            rt = DualRender::s_rt;
+            if (!rt) { cocos2d::CCDirector::drawScene(); return; }
+        }
 
         if (!scene || !rt || !DualRender::s_spoutInitialized) {
             if (pl) {
@@ -380,31 +425,20 @@ class $modify(DualDirector, cocos2d::CCDirector) {
             return;
         }
 
-        auto ws = getWinSizeInPixels();
-        int w = static_cast<int>(ws.width);
-        int h = static_cast<int>(ws.height);
-        if (w != DualRender::s_width || h != DualRender::s_height) {
-            SpoutLife::stop();
-            SpoutLife::start(w, h);
-            DualRender::s_rt = cocos2d::CCRenderTexture::create(w, h, cocos2d::kCCTexture2DPixelFormat_RGBA8888, GL_DEPTH24_STENCIL8);
-            if (DualRender::s_rt) DualRender::s_rt->retain();
-            rt = DualRender::s_rt;
-            if (!rt) { cocos2d::CCDirector::drawScene(); return; }
-        }
-
         // ==========================================
         // GLOBAL CAPTURE (Menus, Editor, etc.)
         // ==========================================
         if (!pl) {
-            // Draw normal scene to Spout
-            DualRender::s_isLayoutPass = false;
-            rt->beginWithClear(0.f, 0.f, 0.f, 1.f, 1.f, 0);
-            scene->visit();
-            rt->end();
-            SpoutLife::send();
-
             // Draw normal scene to Screen
             cocos2d::CCDirector::drawScene();
+
+            // Copy framebuffer (screen) to RenderTexture's texture
+            if (rt && DualRender::s_spoutInitialized) {
+                auto tex = rt->getSprite()->getTexture();
+                ccGLBindTexture2D(tex->getName());
+                glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, w, h);
+                SpoutLife::send();
+            }
             return;
         }
 
