@@ -2,6 +2,8 @@
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/CCDirector.hpp>
 #include <Geode/modify/MenuLayer.hpp>
+#include <Geode/modify/PauseLayer.hpp>
+#include <Geode/modify/EndLevelLayer.hpp>
 
 #include "DualRender.hpp"
 #include "LayoutConfig.hpp"
