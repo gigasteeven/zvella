@@ -22,6 +22,8 @@ public:
     
     // Extracted important groups during level load
     static std::unordered_set<int> s_importantGroups;
+    static void parseImportantGroups(std::string levelString);
+    static bool isDecoration(GameObject* obj);
 };
 
 extern const std::unordered_set<int> robtopLevelIDs;

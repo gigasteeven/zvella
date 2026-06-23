@@ -35,7 +35,22 @@ namespace LayoutFastSwapper {
 
     void tryAdd(GameObject* obj) {
         if (!obj) return;
-        if (XDBot::LayoutMode::isDecoration(obj)) {
+        int id = obj->m_objectID;
+        
+        if (XDBot::decoObjectIDs.contains(id)) {
+            bool isImportant = false;
+            if (obj->m_groups) {
+                for (int i = 0; i < obj->m_groupCount; ++i) {
+                    if (XDBot::LayoutMode::s_importantGroups.contains(obj->m_groups->at(i))) {
+                        isImportant = true;
+                        break;
+                    }
+                }
+            }
+            if (!isImportant) {
+                g_decorations.push_back(obj);
+            }
+        } else if (XDBot::solidObjectIDs.contains(id) && obj->m_scale <= 0.f) {
             g_decorations.push_back(obj);
         }
     }
