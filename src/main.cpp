@@ -24,13 +24,72 @@ bool DualRender::s_inPlayLayer = false;
 static cocos2d::CCLayerColor* g_solidBg = nullptr;
 
 // ============================================================
+// Custom Layout Shader
+// ============================================================
+static cocos2d::CCGLProgram* g_layoutShader = nullptr;
+
+void initLayoutShader() {
+    if (g_layoutShader) return;
+
+    g_layoutShader = new cocos2d::CCGLProgram();
+    
+    const GLchar* vertSource = R"(
+        attribute vec4 a_position;
+        attribute vec2 a_texCoord;
+        attribute vec4 a_color;
+        varying vec4 v_fragmentColor;
+        varying vec2 v_texCoord;
+        void main()
+        {
+            gl_Position = CC_MVPMatrix * a_position;
+            v_fragmentColor = a_color;
+            v_texCoord = a_texCoord;
+        }
+    )";
+
+    const GLchar* fragSource = R"(
+        #ifdef GL_ES
+        precision mediump float;
+        #endif
+        varying vec4 v_fragmentColor;
+        varying vec2 v_texCoord;
+        uniform sampler2D CC_Texture0;
+        void main()
+        {
+            vec4 texColor = texture2D(CC_Texture0, v_texCoord);
+            // Ignore v_fragmentColor.rgb to force the raw texture color (mostly white)
+            // But multiply by alpha to keep transparency and avoid black squares
+            gl_FragColor = vec4(texColor.rgb * v_fragmentColor.a, texColor.a * v_fragmentColor.a);
+        }
+    )";
+    
+    g_layoutShader->initWithVertexShaderByteArray(vertSource, fragSource);
+    g_layoutShader->addAttribute(kCCAttributeNamePosition, kCCVertexAttrib_Position);
+    g_layoutShader->addAttribute(kCCAttributeNameColor, kCCVertexAttrib_Color);
+    g_layoutShader->addAttribute(kCCAttributeNameTexCoord, kCCVertexAttrib_TexCoords);
+    g_layoutShader->link();
+    g_layoutShader->updateUniforms();
+    g_layoutShader->retain();
+}
+
+// ============================================================
 // LayoutFastSwapper (OPTIMIZED)
 // ============================================================
 namespace LayoutFastSwapper {
     static std::vector<GameObject*> g_decorations;
     
+    struct BatchNodeData {
+        cocos2d::CCSpriteBatchNode* node;
+        cocos2d::CCGLProgram* origShader;
+        bool isGlow;
+    };
+    static std::vector<BatchNodeData> g_batchNodes;
+    static bool s_isCached = false;
+
     void clear() {
         g_decorations.clear();
+        g_batchNodes.clear();
+        s_isCached = false;
     }
 
     void tryAdd(GameObject* obj) {
@@ -55,15 +114,44 @@ namespace LayoutFastSwapper {
         }
     }
 
+    void cacheBatchNodes(PlayLayer* pl) {
+        if (s_isCached || !pl || !pl->m_objectLayer) return;
+        auto children = pl->m_objectLayer->getChildren();
+        if (children) {
+            for (int i = 0; i < children->count(); i++) {
+                auto node = static_cast<cocos2d::CCNode*>(children->objectAtIndex(i));
+                if (auto batch = dynamic_cast<cocos2d::CCSpriteBatchNode*>(node)) {
+                    bool isGlow = (batch->getBlendFunc().dst == GL_ONE);
+                    g_batchNodes.push_back({batch, batch->getShaderProgram(), isGlow});
+                }
+            }
+        }
+        s_isCached = true;
+    }
+
     void applyLayoutMode() {
         for (auto* obj : g_decorations) {
             obj->setVisible(false);
+        }
+        for (auto& b : g_batchNodes) {
+            if (b.isGlow) {
+                b.node->setVisible(false);
+            } else {
+                b.node->setShaderProgram(g_layoutShader);
+            }
         }
     }
 
     void restoreOriginalMode() {
         for (auto* obj : g_decorations) {
             obj->setVisible(true);
+        }
+        for (auto& b : g_batchNodes) {
+            if (b.isGlow) {
+                b.node->setVisible(true);
+            } else {
+                b.node->setShaderProgram(b.origShader);
+            }
         }
     }
 }
@@ -193,6 +281,7 @@ class $modify(DualMenuLayer, MenuLayer) {
 
                 SpoutLife::start(w, h);
                 DualRender::s_active = true;
+                initLayoutShader();
             }
         }
         return true;
@@ -292,6 +381,7 @@ class $modify(DualDirector, cocos2d::CCDirector) {
         // ==========================================
         // PLAYLAYER CAPTURE (Layout Mode Bypass)
         // ==========================================
+        LayoutFastSwapper::cacheBatchNodes(pl);
 
         // ─── PASS 1: Clean render → texture → Spout (for OBS) ───
         DualRender::s_isLayoutPass = false;
