@@ -12,46 +12,92 @@ void LayoutMode::parseImportantGroups(std::string levelString) {
     s_importantGroups.clear();
     if (levelString.empty()) return;
 
-    std::string decompString = ZipUtils::decompressString(levelString.c_str(), true, 0);
+    // IMPORTANT: this parses raw level data. Malformed levels / edge cases can
+    // make stoi throw std::invalid_argument, which previously propagated out of
+    // PlayLayer::init and caused an infinite level-reload loop (the "objects fly
+    // around, level disappears, repeats forever" bug). Swallow any parse error —
+    // important groups are only an optimization, not correctness-critical.
+    try {
+        std::string decompString = ZipUtils::decompressString(levelString.c_str(), true, 0);
 
-    std::vector<std::string> objectStrings = utils::string::split(decompString, ";");
-    if (objectStrings.empty()) return;
+        std::vector<std::string> objectStrings = utils::string::split(decompString, ";");
+        if (objectStrings.empty()) return;
 
-    std::string firstPart = objectStrings[0];
-    std::vector<std::string> levelSettings = utils::string::split(firstPart, ",");
+        std::string firstPart = objectStrings[0];
+        std::vector<std::string> levelSettings = utils::string::split(firstPart, ",");
 
-    for (size_t i = 0; i < levelSettings.size(); i++) {
-        if (levelSettings[i] == "kA36") {
-            if (i + 1 < levelSettings.size() && std::stoi(levelSettings[i + 1]) != 0)
-                s_importantGroups.insert(std::stoi(levelSettings[i + 1]));
-            break;
-        }
-    }
-
-    for (size_t i = 1; i < objectStrings.size(); i++) {
-        std::vector<std::string> result = utils::string::split(objectStrings[i], ",");
-        std::map<int, std::string> props;
-
-        for (size_t j = 0; j + 1 < result.size(); j += 2) {
-            auto propID = utils::numFromString<int>(result[j]);
-            if (propID.isErr()) continue;
-            props[propID.unwrap()] = result[j + 1];
-        }
-
-        if (!props.contains(1)) continue;
-        int objectID = std::stoi(props.at(1));
-
-        if (!importantTriggerIDs.contains(objectID)) continue;
-
-        const auto& importantProps = importantTriggerIDs.at(objectID);
-        for (int propID : importantProps) {
-            if (!props.contains(propID)) continue;
-            int groupID = std::stoi(props.at(propID));
-            if (groupID != 0) {
-                s_importantGroups.insert(groupID);
+        for (size_t i = 0; i < levelSettings.size(); i++) {
+            if (levelSettings[i] == "kA36") {
+                if (i + 1 < levelSettings.size()) {
+                    auto v = utils::numFromString<int>(levelSettings[i + 1]);
+                    if (v.isOk() && v.unwrap() != 0)
+                        s_importantGroups.insert(v.unwrap());
+                }
+                break;
             }
         }
+
+        for (size_t i = 1; i < objectStrings.size(); i++) {
+            std::vector<std::string> result = utils::string::split(objectStrings[i], ",");
+            std::map<int, std::string> props;
+
+            for (size_t j = 0; j + 1 < result.size(); j += 2) {
+                auto propID = utils::numFromString<int>(result[j]);
+                if (propID.isErr()) continue;
+                props[propID.unwrap()] = result[j + 1];
+            }
+
+            if (!props.contains(1)) continue;
+            auto idRes = utils::numFromString<int>(props.at(1));
+            if (idRes.isErr()) continue;
+            int objectID = idRes.unwrap();
+
+            if (!importantTriggerIDs.contains(objectID)) continue;
+
+            const auto& importantProps = importantTriggerIDs.at(objectID);
+            for (int propID : importantProps) {
+                if (!props.contains(propID)) continue;
+                auto gRes = utils::numFromString<int>(props.at(propID));
+                if (gRes.isErr()) continue;
+                if (gRes.unwrap() != 0)
+                    s_importantGroups.insert(gRes.unwrap());
+            }
+        }
+    } catch (...) {
+        // Best-effort parse; if it fails, just continue with an empty set.
+        // Layout mode still works (just without the "important group" keep-list).
     }
+}
+
+// Decide whether an object should be hidden in the layout (screen) pass.
+// Mirrors XDBot's logic but is safe to call per-frame from the visit() hook.
+bool LayoutMode::isDecoration(GameObject* obj) {
+    if (!obj) return false;
+    int id = obj->m_objectID;
+
+    // Excluded triggers (portals/pads/shaders) — always hide in layout.
+    if (excludedTriggerIDs.contains(id)) return true;
+
+    bool isDeco = decoObjectIDs.contains(id) || obj->m_objectType == GameObjectType::Decoration;
+
+    // A decoration that belongs to an "important" group is kept (it usually
+    // gates gameplay, e.g. a deco object tied to a spawn/alpha trigger group).
+    if (isDeco && !s_importantGroups.empty() && obj->m_groups) {
+        for (int g = 0; g < obj->m_groupCount; ++g) {
+            if (s_importantGroups.contains(obj->m_groups->at(g)))
+                return false; // important — keep it
+        }
+    }
+
+    if (isDeco) return true;
+
+    // Solid objects that are scaled to 0 by the level are hidden in layout too.
+    if (solidObjectIDs.contains(id) && obj->getScale() <= 0.f) return true;
+
+    // ID 2065 is a special "ghost" block hidden in XDBot layout.
+    if (id == 2065) return true;
+
+    return false;
 }
 
 const std::unordered_set<int> robtopLevelIDs = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 3001, 5001, 5002, 5003, 5004 };

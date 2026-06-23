@@ -8,8 +8,11 @@ namespace DualRender {
     // false = current pass is the clean render for OBS (Spout)
     inline bool s_isLayoutPass = false;
 
-    // Whether dual render is currently active (in PlayLayer)
+    // Whether dual render is currently active (mod enabled)
     inline bool s_active = false;
+
+    // true while we are inside a PlayLayer (level is being played)
+    inline bool s_inPlayLayer = false;
 
     // Spout state
     inline bool s_spoutInitialized = false;
