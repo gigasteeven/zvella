@@ -1,6 +1,7 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/CCDirector.hpp>
+#include <chrono>
 
 #include "DualRender.hpp"
 #include "LayoutConfig.hpp"
@@ -19,10 +20,11 @@ void initLayoutShader() {
     if (g_layoutShader) return;
     g_layoutShader = new cocos2d::CCGLProgram();
     
-    // THIS is the magic. We ignore the color tint (v_fragmentColor.rgb) and just 
-    // render the raw texture colors. This produces the EXACT Eclipse Layout look 
-    // (white lines, black centers) instead of solid white blobs!
+    // Exact Eclipse Layout look: Ignore level colors, render raw texture.
     const GLchar* fragSource = R"(
+        #ifdef GL_ES
+        precision mediump float;
+        #endif
         varying vec4 v_fragmentColor;
         varying vec2 v_texCoord;
         uniform sampler2D CC_Texture0;
@@ -33,7 +35,8 @@ void initLayoutShader() {
         }
     )";
     
-    // Standard Cocos2d-x vertex shader
+    // FIXED: Must use CC_MVPMatrix for the camera to move properly!
+    // Using CC_PMatrix caused the "static overlay" bug.
     const GLchar* vertSource = R"(
         attribute vec4 a_position;
         attribute vec2 a_texCoord;
@@ -42,7 +45,7 @@ void initLayoutShader() {
         varying vec2 v_texCoord;
         void main()
         {
-            gl_Position = CC_PMatrix * a_position;
+            gl_Position = CC_MVPMatrix * a_position;
             v_fragmentColor = a_color;
             v_texCoord = a_texCoord;
         }
@@ -85,24 +88,20 @@ namespace LayoutFastSwapper {
     void applyLayoutMode(PlayLayer* pl) {
         if (!pl || !pl->m_objectLayer) return;
 
-        // 1. Hide decorations
         for (auto* obj : g_decorations) {
             obj->setVisible(false);
         }
 
-        // 2. Hide Glow & Apply Raw Texture Shader to blocks
         auto children = pl->m_objectLayer->getChildren();
         if (children) {
             for (int i = 0; i < children->count(); i++) {
                 auto node = static_cast<cocos2d::CCNode*>(children->objectAtIndex(i));
                 if (auto batch = dynamic_cast<cocos2d::CCSpriteBatchNode*>(node)) {
                     cocos2d::ccBlendFunc blend = batch->getBlendFunc();
-                    // GL_ONE is additive blending (Glow)
                     if (blend.dst == GL_ONE) {
                         g_savedGlowNodes.push_back({batch, batch->isVisible()});
                         batch->setVisible(false);
                     } else {
-                        // Apply layout shader to normal gameplay blocks
                         g_savedShaders.push_back({batch, batch->getShaderProgram()});
                         batch->setShaderProgram(g_layoutShader);
                     }
@@ -129,7 +128,7 @@ namespace LayoutFastSwapper {
 }
 
 // ============================================================
-// LayoutLook — temporarily recolor BG / Ground / MG nodes
+// LayoutLook
 // ============================================================
 namespace LayoutLook {
     struct Saved { cocos2d::CCNodeRGBA* node; cocos2d::ccColor3B color; };
@@ -202,7 +201,7 @@ namespace SpoutLife {
 }
 
 // ============================================================
-// PlayLayer — lifecycle + cache decorations in addObject
+// PlayLayer
 // ============================================================
 class $modify(DualPlayLayer, PlayLayer) {
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
@@ -223,9 +222,8 @@ class $modify(DualPlayLayer, PlayLayer) {
             SpoutLife::start(w, h);
             DualRender::s_active = true;
             
-            // Check for Eclipse
             if (Loader::get()->isModLoaded("eclipse.layoutmode") || Loader::get()->isModLoaded("eclipse")) {
-                log::warn("ECLIPSE LAYOUT MODE DETECTED! This will BREAK the OBS capture. Please disable Layout Mode in Eclipse menu!");
+                log::warn("ECLIPSE LAYOUT MODE DETECTED! Disable it for OBS bypass to work!");
             }
         }
         return true;
@@ -250,7 +248,7 @@ class $modify(DualPlayLayer, PlayLayer) {
 };
 
 // ============================================================
-// CCDirector::drawScene — Consistent Dual Render
+// CCDirector::drawScene
 // ============================================================
 class $modify(DualDirector, cocos2d::CCDirector) {
     void drawScene() {
@@ -272,7 +270,6 @@ class $modify(DualDirector, cocos2d::CCDirector) {
             return;
         }
 
-        // Handle window resize
         auto ws = getWinSizeInPixels();
         int w = static_cast<int>(ws.width);
         int h = static_cast<int>(ws.height);
@@ -284,12 +281,6 @@ class $modify(DualDirector, cocos2d::CCDirector) {
             rt = DualRender::s_rt;
             if (!rt) { cocos2d::CCDirector::drawScene(); return; }
         }
-
-        // We REMOVED the OBS FPS limiter.
-        // Doing the dual render ONLY 60 times a second creates massively fluctuating frame times
-        // (1ms vs 8ms), which is exactly what causes microstutters in Geometry Dash physics/gameplay.
-        // Rendering both passes consistently every frame ensures buttery smooth gameplay,
-        // even if the raw FPS counter drops slightly. A smooth 120 FPS is better than a stuttering 164 FPS.
 
         // ─── PASS 1: Clean render → texture → Spout (for OBS) ───
         DualRender::s_isLayoutPass = false;
@@ -314,5 +305,5 @@ class $modify(DualDirector, cocos2d::CCDirector) {
 };
 
 $on_mod(Loaded) {
-    log::info("Layout Mode OBS Bypass Stable Edition loaded!");
+    log::info("Layout Mode OBS Bypass Shader Edition V2 loaded!");
 }
