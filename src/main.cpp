@@ -207,6 +207,7 @@ class $modify(PlayLayer) {
         if (level && !level->m_levelString.empty()) {
             XDBot::LayoutMode::parseImportantGroups(level->m_levelString);
         }
+        DualRender::s_inPlayLayer = true;
         DualRender::s_active = true;
         LayoutFastSwapper::clear();
         bool ret = PlayLayer::init(level, useReplay, dontCreateObjects);
