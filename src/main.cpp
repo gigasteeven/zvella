@@ -411,7 +411,6 @@ class $modify(DualDirector, cocos2d::CCDirector) {
         // ==========================================
         // PLAYLAYER CAPTURE (Layout Mode Bypass)
         // ==========================================
-        LayoutFastSwapper::cacheBatchNodes(pl);
 
         // ─── PASS 1: Clean render → texture → Spout (for OBS) ───
         DualRender::s_isLayoutPass = false;
